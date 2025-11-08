@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <title>Flight Reservation</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url("elnido.jpg");
+      background-size: cover;
+      margin: 0;
+      padding: 0px;
+    }
+
+    .content-container {
+      max-width: 1250px;
+      margin: 50px auto 0 auto;  
+      background: #ffffff;
+      padding: 50px;
+      border-radius: 50px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .navbar .container-fluid {
+      padding: 0 40px;
+    }
+
+    h1 {
+      color: #007bff;
+      margin-bottom: 50px;
+      margin-top: -20px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .seat-map {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+      margin: 15px 0 25px 0;
+    }
+
+    .seat {
+      width: 60px;
+      height: 35px;
+      background: #e0e0e0;
+      text-align: center;
+      line-height: 35px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .seat.selected {
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+    }
+
+    .seat.occupied {
+      background: #dc3545;
+      color: white;
+      cursor: not-allowed;
+    }
+
+    .summary-box {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 50px;  
+      margin-bottom: 50px;  
+    }
+
+    .back-button {
+      width: 100;
+      padding: 10px;
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer; 
+    }
+
+    #bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 120%; /* make it slightly larger than viewport */
+      filter: blur(10px);
+      z-index: -1;
+    }
+
+
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="landingpage.html">Airline Ticketing System</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="landingpage.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="my_reservations.html">My Reservations</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="bg"></div>
+  <div class="content-container">
+    <h1>Book Your Flight 🔖</h1>
+
+    <form id="reservationForm">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter full name" required>
+
+      <label>Email</label>
+      <input type="email" id="email" placeholder="Enter email" required>
+
+      <label>Passport Number</label>
+      <input type="text" id="passport" placeholder="Enter passport number" required>
+
+      <label>Meal Option</label>
+      <select id="meal">
+        <option value="0">Chips (PHP 0)</option>
+        <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
+        <option value="270">Sausage with Hashbrown (PHP 270)</option>
+        <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
+        <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
+      </select>
+
+      <label>Extra Baggage (PHP 500 per bag)</label>
+      <input type="number" id="baggage" value="0" min="0">
+
+      <label>Select Your Seat</label>
+      <div class="seat-map" id="seatMap"></div>
+
+      <div class="summary-box">
+        <h3>Reservation Summary</h3>
+        <p id="summary">Base Fare: PHP 5,000<br>Total: PHP 5,000</p>
+      </div>
+
+      <button type="submit">Confirm Reservation ✈️</button>
+
+      <a href="landingpage.html" class="back-button">⬅ Back to Flight Search</a>
+
+    </form>
+  </div>
+
+   <script>
+  
+    const images = [
+      "elnido.jpg",
+      "baguio.jpg",
+      "mayon.jpg",
+      "ilocos.jpg",
+      "bohol.jpg"
+    ];
+
+    const randomImage = images[Math.floor(Math.random() * images.length)];
+
+    document.body.style.background = `url('${randomImage}') no-repeat center center fixed`;
+    document.body.style.backgroundSize = "cover";
+    document.getElementById("bg").style.background = `url('${randomImage}') center/cover no-repeat fixed`;
+  </script>
+
+  <script>
+    $(document).ready(function(){
+      let baseFare = 5000;
+      let selectedSeat = null;
+      
+      for(let row = 1; row <= 4; row++){
+        for(let col = 1; col <= 15; col++){
+          let seatNum = String.fromCharCode(64 + row) + col; // A1, A2, ..., D15
+          $("#seatMap").append(`<div class="seat" data-seat="${seatNum}">${seatNum}</div>`);
+        }
+
+        if (row == 2){
+          $("#seatMap").append("<div style='flex-basis: 100%; height: 50px;'></div>");
+        } else {
+          $("#seatMap").append("<div style='flex-basis: 100%; height: 5px;'></div>");
+        }
+      }
+
+     
+      $(document).on("click", ".seat", function(){
+        if($(this).hasClass("occupied")) return;
+        $(".seat.selected").removeClass("selected");
+        $(this).addClass("selected");
+        selectedSeat = $(this).data("seat");
+        updateSummary();
+      });
+
+    
+      function updateSummary(){
+        let mealCost = parseInt($("#meal").val());
+        let baggageCost = parseInt($("#baggage").val()) * 500;
+        let total = baseFare + mealCost + baggageCost;
+        $("#summary").html(`
+          Base Fare: PHP ${baseFare}<br>
+          Meal Cost: PHP ${mealCost}<br>
+          Baggage: PHP ${baggageCost}<br>
+          Seat: ${selectedSeat || "Not selected"}<br>
+          <b>Total: PHP ${total}</b>
+        `);
+      }
+
+      $("#meal, #baggage").on("change keyup", updateSummary);
+
+   
+      $("#reservationForm").submit(function(e){
+        e.preventDefault();
+        alert("Reservation confirmed!\n\n" + $("#summary").text());
+        this.reset();
+        $("#summary").html("Base Fare: PHP 5,000<br>Total: PHP 5,000");
+        $(".seat.selected").removeClass("selected");
+      });
+    });
+  </script>
+</body>
+</html>
