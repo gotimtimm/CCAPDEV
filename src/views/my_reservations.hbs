@@ -8,81 +8,31 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <title>My Reservations</title>
 </head>
-
 <body class="bg-light">
-  
   <section id="my" class="container my-5">
     <h3 class="mb-4">My Reservations</h3>
-    <div id="bookingsList" class="list-group shadow-sm"></div>
-  </section>
-  <div class="modal fade" id="bookingModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Booking Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div id="bookingsList" class="list-group shadow-sm">
+      {{#each reservations}}
+      <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-bold">{{this.flightId.flightNumber}} ({{this.bookingStatus}})</div>
+          <div>{{this.flightId.origin}} → {{this.flightId.destination}}</div>
+          <div>Passenger: {{this.passengerName}}</div>
+          <div>Seat: {{this.selectedSeat}}</div>
         </div>
-        <div class="modal-body" id="bookingDetailsBody"></div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div class="d-flex flex-column">
+          <span class="fw-bold mb-2">PHP {{this.totalCost}}</span>
+          {{#if (eq this.bookingStatus "Confirmed")}}
+          <form action="/reservations/cancel/{{this._id}}" method="POST">
+            <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+          </form>
+          {{/if}}
         </div>
       </div>
+      {{else}}
+      <p>You have no reservations.</p>
+      {{/each}}
     </div>
-  </div>
-  <script>
-    const dummyBookings = [
-      {
-        id: "BKG1001",
-        flight: { airline: "FlyExpress", id: "FX100", from: "MNL", to: "CEB" },
-        passenger: { name: "Juan Dela Cruz", email: "juan@example.com" },
-        prices: { total: 120 },
-        options: { seats: ["A1", "A2"], meal: "Vegetarian", baggageKg: 10, requests: "" }
-      },
-      {
-        id: "BKG1002",
-        flight: { airline: "PinoyAir", id: "PN200", from: "MNL", to: "DVO" },
-        passenger: { name: "Maria Clara", email: "maria@example.com" },
-        prices: { total: 90 },
-        options: { seats: [], meal: "Standard", baggageKg: 0, requests: "Window seat please" }
-      }
-    ];
-    function renderBookings() {
-      const $list = $("#bookingsList").empty();
-      dummyBookings.forEach(b => {
-        const item = $(`
-          <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" data-id="${b.id}">
-            <div>
-              <div class="fw-bold">${b.flight.airline} ${b.flight.id}</div>
-              <div>${b.flight.from}→${b.flight.to} • ${b.passenger.name}</div>
-            </div>
-            <div>$${b.prices.total}</div>
-          </a>
-        `);
-        $list.append(item);
-      });
-    }
-    $(document).on("click", "#bookingsList .list-group-item", function (e) {
-      e.preventDefault();
-      const id = $(this).data("id");
-      const b = dummyBookings.find(x => x.id === id);
-      if (!b) return;
-      const html = `
-        <p><strong>Booking ID:</strong> ${b.id}</p>
-        <p><strong>Flight:</strong> ${b.flight.airline} ${b.flight.id} (${b.flight.from}→${b.flight.to})</p>
-        <p><strong>Passenger:</strong> ${b.passenger.name} (${b.passenger.email})</p>
-        <p><strong>Seats:</strong> ${b.options.seats.join(", ") || "None"}</p>
-        <p><strong>Meal:</strong> ${b.options.meal}</p>
-        <p><strong>Baggage:</strong> ${b.options.baggageKg} kg</p>
-        <p><strong>Special Requests:</strong> ${b.options.requests || "—"}</p>
-        <hr>
-        <p class='fw-bold'>Total: $${b.prices.total}</p>
-      `;
-      $("#bookingDetailsBody").html(html);
-      new bootstrap.Modal(document.getElementById("bookingModal")).show();
-    });
-    $(function () {
-      renderBookings();
-    });
-  </script>
+  </section>
 </body>
 </html>
