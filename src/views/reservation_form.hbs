@@ -11,8 +11,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      /* --- CORRECTION HERE --- */
-      background: url("../../public/images/elnido.jpg"); 
+      background: url("/images/elnido.jpg"); 
       background-size: cover;
       margin: 0;
       padding: 0px;
@@ -132,22 +131,6 @@
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="landingpage.html">Airline Ticketing System</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="landingpage.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="my_reservations.html">My Reservations</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
   <div id="bg"></div>
   <div class="content-container">
     <h1>Book Your Flight 🔖</h1>
@@ -184,7 +167,7 @@
 
       <button type="submit">Confirm Reservation ✈️</button>
 
-      <a href="landingpage.html" class="back-button">⬅ Back to Flight Search</a>
+      <a href="/" class="back-button">⬅ Back to Flight Search</a>
 
     </form>
   </div>
@@ -192,11 +175,11 @@
    <script>
   
     const images = [
-      "../../public/images/elnido.jpg",
-      "../../public/images/baguio.jpg",
-      "../../public/images/mayon.jpg",
-      "../../public/images/ilocos.jpg",
-      "../../public/images/bohol.jpg"
+      "/images/elnido.jpg",
+      "/images/baguio.jpg",
+      "/images/mayon.jpg",
+      "/images/ilocos.jpg",
+      "/images/bohol.jpg"
     ];
 
     const randomImage = images[Math.floor(Math.random() * images.length)];
@@ -260,4 +243,4 @@
     });
   </script>
 </body>
-</html>
+</html> 

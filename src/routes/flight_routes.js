@@ -1,17 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const Flight = require('../models/flight'); 
+const Flight = require('../models/flight');
 
 router.get('/', async (req, res) => {
   try {
-    const flights = await flight.find({});
+    const flights = await Flight.find({}); 
+    
     res.render('admin_flights', { 
         flights: flights, 
-        layout: 'main' // Specify layout
+        layout: 'main'
     }); 
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    console.error("Error in /flights route:", err);
+    res.status(500).send('Server Error. Check terminal for details.');
   }
 });
 
@@ -31,8 +32,8 @@ router.post('/add', async (req, res) => {
     await newFlight.save();
     res.redirect('/flights'); 
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    console.error("Error in /flights/add route:", err);
+    res.status(500).send('Server Error. Check terminal for details.');
   }
 });
 
@@ -42,8 +43,8 @@ router.post('/delete/:id', async (req, res) => {
     await Flight.findByIdAndDelete(flightId);
     res.redirect('/flights');
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    console.error("Error in /flights/delete route:", err);
+    res.status(500).send('Server Error. Check terminal for details.');
   }
 });
 

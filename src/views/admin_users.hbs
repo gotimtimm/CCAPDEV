@@ -8,12 +8,25 @@
 
   <div class="container mt-4">
     <h3>User Management</h3>
+    
     <table class="table">
       <thead>
-        <tr><th>User ID</th><th>Name</th><th>Email</th><th>Actions</th></tr>
+        <tr>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>1</td><td>Admin User</td><td>admin@lasalle.edu</td><td><button class="btn btn-sm btn-warning">Edit</button></td></tr>
+        {{#each users}}
+        <tr>
+          <td>{{this._id}}</td>
+          <td>{{this.name}}</td>
+          <td>{{this.email}}</td>
+          <td><button class="btn btn-sm btn-warning">Edit</button></td>
+        </tr>
+        {{/each}}
       </tbody>
     </table>
   </div>

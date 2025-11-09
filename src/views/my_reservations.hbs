@@ -9,45 +9,8 @@
   <title>My Reservations</title>
 </head>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-   
-    let currentPage = window.location.pathname.split("/").pop();
-    if (currentPage === "" || currentPage === "/") {
-      currentPage = "landingpage.html";
-    }
-
-    document.querySelectorAll(".navbar-nav .nav-link").forEach(link => {
-      const href = link.getAttribute("href");
-
-      if (href === currentPage) {
-        link.classList.add("active");
-        link.setAttribute("aria-current", "page");
-      } else {
-        link.classList.remove("active");
-        link.removeAttribute("aria-current");
-      }
-    });
-  });
-</script>
-
-
 <body class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand fw-bold" href="landingpage.html">Airline Ticketing System</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="landingpage.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="my_reservations.html">My Reservations</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  
   <section id="my" class="container my-5">
     <h3 class="mb-4">My Reservations</h3>
     <div id="bookingsList" class="list-group shadow-sm"></div>
