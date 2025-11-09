@@ -51,10 +51,10 @@
         <td>{{this.seatCapacity}}</td>
         <td>{{this.seatsAvailable}}</td>
         <td>
-          <form action="/flights/delete/{{this._id}}" method="POST" style="display: inline;">
+          <form action="/flights/delete/{{this.id}}" method="POST" style="display: inline;">
             <button type="submit" class="btn btn-sm btn-danger">Delete</button>
           </form>
-          <a href="/flights/edit/{{this._id}}" class="btn btn-sm btn-warning">Edit</a>
+          <a href="/flights/edit/{{this.id}}" class="btn btn-sm btn-warning">Edit</a>
         </td>
       </tr>
       {{/each}}

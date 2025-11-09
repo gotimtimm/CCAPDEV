@@ -37,7 +37,7 @@ app.set('views', './src/views');
 
 app.get('/', async (req, res) => {
   try {
-    const flights = await Flight.find({});
+    const flights = await Flight.find({}).lean(); 
     res.render('landingpage', { 
       layout: 'main',
       flights: flights
@@ -49,7 +49,7 @@ app.get('/', async (req, res) => {
 
 app.get('/my-reservations', async (req, res) => {
   try {
-    const reservations = await Reservation.find({}).populate('flightId');
+    const reservations = await Reservation.find({}).populate('flightId').lean(); 
     res.render('my_reservations', { 
       layout: 'main',
       reservations: reservations
@@ -68,7 +68,7 @@ app.get('/reservation-form', (req, res) => {
 
 app.get('/profile', async (req, res) => {
   try {
-    const user = await User.findOne({});
+    const user = await User.findOne({}).lean(); 
     res.render('profile', { 
       layout: 'main',
       user: user
@@ -80,7 +80,7 @@ app.get('/profile', async (req, res) => {
 
 app.get('/admin/users', async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}).lean(); 
     res.render('admin_users', { 
       layout: 'main',
       users: users

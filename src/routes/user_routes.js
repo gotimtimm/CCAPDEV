@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 router.post('/update', async (req, res) => {
   try {
-    const userId = "YOUR_HARDCODED_USER_ID"; 
+    const userId = "654cbb1f9d4f1b2b8c9a6a8d"; 
     
     const { fullName, email, passportNumber } = req.body;
     
