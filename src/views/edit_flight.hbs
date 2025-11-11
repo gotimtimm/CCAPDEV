@@ -1,0 +1,46 @@
+<h3>{{pageTitle}}</h3>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form action="/admin/flights/update/{{flight._id}}" method="POST">
+      
+      <div class="mb-3">
+        <label for="flightNumber" class="form-label">Flight Number</label>
+        <input type="text" class="form-control" id="flightNumber" name="flightNumber" value="{{flight.flightNumber}}" required>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="origin" class="form-label">Origin</label>
+          <input type="text" class="form-control" id="origin" name="origin" value="{{flight.origin}}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="destination" class="form-label">Destination</label>
+          <input type="text" class="form-control" id="destination" name="destination" value="{{flight.destination}}" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="schedule" class="form-label">Schedule</label>
+        <input type="text" class="form-control" id="schedule" name="schedule" value="{{flight.schedule}}" required>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <label for="aircraftType" class="form-label">Aircraft Type</label>
+          <input type="text" class="form-control" id="aircraftType" name="aircraftType" value="{{flight.aircraftType}}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="seatCapacity" class="form-label">Seat Capacity</label>
+          <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" value="{{flight.seatCapacity}}" min="1" required>
+        </div>
+      </div>
+      
+      <hr>
+      
+      <button type="submit" class="btn btn-success">Update Flight</button>
+      <a href="/admin/flights" class="btn btn-secondary">Cancel</a>
+      
+    </form>
+  </div>
+</div>

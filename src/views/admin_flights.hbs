@@ -1,66 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Admin - Flight Management</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+<h3>{{pageTitle}}</h3>
 
-<div class="container mt-4">
-  <h3>Flight Management</h3>
+<a href="/admin/flights/new" class="btn btn-primary mb-3">Add New Flight</a>
 
-  <h4 class="mt-4">Add New Flight</h4>
-  <form action="/flights/add" method="POST" class="row g-3 bg-light p-3 rounded mb-4">
-    <div class="col-md-2">
-      <input type="text" name="flightNumber" class="form-control" placeholder="Flight No (e.g., PR123)" required>
-    </div>
-    <div class="col-md-2">
-      <input type="text" name="origin" class="form-control" placeholder="Origin (e.g., MNL)" required>
-    </div>
-    <div class="col-md-2">
-      <input type="text" name="destination" class="form-control" placeholder="Destination (e.g., CEB)" required>
-    </div>
-    <div class="col-md-3">
-      <input type="datetime-local" name="schedule" class="form-control" required>
-    </div>
-    <div class="col-md-2">
-      <input type="number" name="seatCapacity" class="form-control" placeholder="Capacity" min="1" required>
-    </div>
-    <div class="col-md-1">
-      <button type="submit" class="btn btn-primary w-100">Add</button>
-    </div>
-  </form>
-
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Flight No</th>
-        <th>Route</th>
-        <th>Schedule</th>
-        <th>Capacity</th>
-        <th>Available</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each flights}}
-      <tr>
-        <td>{{this.flightNumber}}</td>
-        <td>{{this.origin}} → {{this.destination}}</td>
-        <td>{{this.schedule}}</td>
-        <td>{{this.seatCapacity}}</td>
-        <td>{{this.seatsAvailable}}</td>
-        <td>
-          <form action="/flights/delete/{{this._id}}" method="POST" style="display: inline;">
-            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-          </form>
-          <a href="/flights/edit/{{this._id}}" class="btn btn-sm btn-warning">Edit</a>
-        </td>
-      </tr>
-      {{/each}}
-
-    </tbody>
-  </table>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover table-striped mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>Flight No</th>
+          <th>Origin</th>
+          <th>Destination</th>
+          <th>Schedule</th>
+          <th>Aircraft Type</th>
+          <th>Seat Capacity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each flights}}
+        <tr>
+          <td>{{this.flightNumber}}</td>
+          <td>{{this.origin}}</td>
+          <td>{{this.destination}}</td>
+          <td>{{this.schedule}}</td>
+          <td>{{this.aircraftType}}</td>
+          <td>{{this.seatCapacity}}</td>
+          <td>
+            <a href="/admin/flights/edit/{{this._id}}" class="btn btn-sm btn-warning">Edit</a>
+            
+            <form action="/admin/flights/delete/{{this._id}}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
 </div>
-</body>
-</html>
+
+{{#if (eq flights.length 0)}}
+  <p class="text-center mt-3">No flights found. <a href="/admin/flights/new">Add one!</a></p>
+{{/if}}

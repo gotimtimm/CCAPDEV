@@ -1,52 +1,46 @@
 const express = require('express');
-const { create } = require('express-handlebars');
 const mongoose = require('mongoose');
-
-const flightRoutes = require('./src/routes/flight_routes');
+const { engine } = require('express-handlebars');
+const flightRoutes = require('./routes/flightRoutes');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-const MONGO_URI = 'mongodb://127.0.0.1:27017/airlineDB'; 
+// --- 1. MONGODB CONNECTION ---
+// !! IMPORTANT !!
+// Replace this with your actual MongoDB connection string
+const MONGO_URI = "YOUR_MONGODB_CONNECTION_STRING_GOES_HERE";
 
 mongoose.connect(MONGO_URI)
-  .then(() => console.log('MongoDB connected successfully.'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log("MongoDB Connected..."))
+  .catch(err => console.error("MongoDB Connection Error:", err));
 
-app.use(express.static('public')); 
-app.use(express.urlencoded({ extended: true })); 
+// --- 2. MIDDLEWARE ---
+// Parses form data from POST requests
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-const hbs = create({
+// --- 3. HANDLEBARS VIEW ENGINE ---
+// Set up Handlebars
+app.engine('hbs', engine({
   extname: '.hbs',
-  defaultLayout: 'main',
-  layoutsDir: __dirname + '/src/views/layouts'
-});
-app.engine('hbs', hbs.engine);
+  defaultLayout: 'main' // This is the 'main.hbs' file
+}));
 app.set('view engine', 'hbs');
-app.set('views', './src/views'); 
+app.set('views', './views'); // Point to the 'views' folder
 
+// --- 4. ROUTES ---
+// Mount the flight routes for the admin panel
+// All routes in flightRoutes.js will be prefixed with /admin/flights
+app.use('/admin/flights', flightRoutes);
+
+// Simple home page route to make sure it's working
 app.get('/', (req, res) => {
-  res.render('landingpage', { layout: 'main' }); 
+  // Redirect to the admin flights page
+  res.redirect('/admin/flights');
 });
 
-app.use('/flights', flightRoutes);
-
-app.get('/my-reservations', (req, res) => {
-  res.render('my_reservations', { layout: 'main' });
-});
-
-app.get('/reservation-form', (req, res) => {
-  res.render('reservation_form', { layout: 'main' });
-});
-
-app.get('/profile', (req, res) => {
-  res.render('profile', { layout: 'main' });
-});
-
-app.get('/admin/users', (req, res) => {
-  res.render('admin_users', { layout: 'main' });
-});
-
+// --- 5. START THE SERVER ---
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
