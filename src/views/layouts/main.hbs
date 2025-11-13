@@ -18,7 +18,7 @@
           {{#if user}}
             <li class="nav-item"><a class="nav-link" href="/reservations/my-reservations">My Reservations</a></li>
             <li class="nav-item"><a class="nav-link" href="/user/profile">Profile</a></li>
-            {{#if user.isAdmin}}
+            {{#if (eq user.role 'admin')}}
               <li class="nav-item"><a class="nav-link" href="/admin/users">Admin-Users</a></li>
               <li class="nav-item"><a class="nav-link" href="/flights">Admin-Flights</a></li>
             {{/if}}
