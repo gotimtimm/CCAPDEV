@@ -8,15 +8,28 @@
         <label for="flightNumber" class="form-label">Flight Number</label>
         <input type="text" class="form-control" id="flightNumber" name="flightNumber" value="{{flight.flightNumber}}" required>
       </div>
+      
+      <div class="mb-3">
+        <label for="airlineName" class="form-label">Airline Name</label>
+        <input type="text" class="form-control" id="airlineName" name="airlineName" value="{{flight.airlineName}}" required>
+      </div>
 
       <div class="row">
         <div class="col-md-6 mb-3">
           <label for="origin" class="form-label">Origin</label>
-          <input type="text" class="form-control" id="origin" name="origin" value="{{flight.origin}}" required>
+          <select class="form-control" id="origin" name="origin" required>
+            {{#each locations}}
+              <option value="{{this}}" {{#if (eq this flight.origin)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+          </select>
         </div>
         <div class="col-md-6 mb-3">
           <label for="destination" class="form-label">Destination</label>
-          <input type="text" class="form-control" id="destination" name="destination" value="{{flight.destination}}" required>
+          <select class="form-control" id="destination" name="destination" required>
+            {{#each locations}}
+              <option value="{{this}}" {{#if (eq this flight.destination)}}selected{{/if}}>{{this}}</option>
+            {{/each}}
+          </select>
         </div>
       </div>
 
@@ -25,9 +38,15 @@
         <input type="number" class="form-control" id="basePrice" name="basePrice" value="{{flight.basePrice}}" min="0" required>
       </div>
 
-      <div class="mb-3">
-        <label for="schedule" class="form-label">Schedule</label>
-        <input type="text" class="form-control" id="schedule" name="schedule" value="{{flight.schedule}}" required>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="departureTime" class="form-label">Departure Time</label>
+          <input type="time" class="form-control" id="departureTime" name="departureTime" value="{{flight.departureTime}}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="arrivalTime" class="form-label">Arrival Time</label>
+          <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" value="{{flight.arrivalTime}}" required>
+        </div>
       </div>
 
       <div class="row">
@@ -35,7 +54,8 @@
           <label for="aircraftType" class="form-label">Aircraft Type</label>
           <input type="text" class="form-control" id="aircraftType" name="aircraftType" value="{{flight.aircraftType}}" required>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 
+mb-3">
           <label for="seatCapacity" class="form-label">Seat Capacity</label>
           <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" value="{{flight.seatCapacity}}" min="1" required>
         </div>

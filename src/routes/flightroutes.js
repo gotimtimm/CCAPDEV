@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const Flight = require('../models/flightModel');
 
+// Define locations once
+const locations = ['MANILA', 'CEBU', 'DAVAO'];
+
 // --- 1. READ (View All Flights) ---
 // GET /admin/flights
 router.get('/', async (req, res) => {
@@ -21,7 +24,8 @@ router.get('/', async (req, res) => {
 // GET /admin/flights/new
 router.get('/new', (req, res) => {
   res.render('add_flight', {
-    pageTitle: "Add New Flight"
+    pageTitle: "Add New Flight",
+    locations: locations
   });
 });
 
@@ -32,10 +36,12 @@ router.post('/create', async (req, res) => {
     // req.body contains the data from the 'add_flight.hbs' form
     const newFlight = new Flight({
       flightNumber: req.body.flightNumber,
+      airlineName: req.body.airlineName,
       origin: req.body.origin,
       destination: req.body.destination,
       basePrice: req.body.basePrice,
-      schedule: req.body.schedule,
+      departureTime: req.body.departureTime,
+      arrivalTime: req.body.arrivalTime,
       aircraftType: req.body.aircraftType,
       seatCapacity: req.body.seatCapacity
     });
@@ -57,7 +63,8 @@ router.get('/edit/:id', async (req, res) => {
     }
     res.render('edit_flight', {
       flight: flight,
-      pageTitle: "Edit Flight"
+      pageTitle: "Edit Flight",
+      locations: locations
     });
   } catch (err) {
     res.status(500).send("Error fetching flight: " + err.message);
@@ -68,6 +75,7 @@ router.get('/edit/:id', async (req, res) => {
 // POST /admin/flights/update/:id
 router.post('/update/:id', async (req, res) => {
   try {
+    // req.body now contains airlineName, departureTime, and arrivalTime
     await Flight.findByIdAndUpdate(req.params.id, req.body);
     res.redirect('/admin/flights'); // Redirect back to the list
   } catch (err) {

@@ -28,7 +28,7 @@ app.engine('hbs', engine({
   extname: '.hbs',
   defaultLayout: 'main',
   layoutsDir: './src/views/layouts',
-  // Add 'eq' helper used in admin_flights.hbs
+  // Add 'eq' helper used in admin_flights.hbs (and now edit_flight.hbs)
   helpers: {
     eq: function(v1, v2) { return v1 === v2; }
   }
@@ -46,10 +46,12 @@ app.get('/', async (req, res) => {
   try {
     // Fetch all flights to display on the landing page
     const flights = await Flight.find().lean();
-    
+    const locations = ['MANILA', 'CEBU', 'DAVAO'];
+
     res.render('landingpage', { 
       pageTitle: "Flight Search",
-      flights: flights // Pass flights to the template
+      flights: flights, // Pass flights to the template
+      locations: locations // Pass locations to the template
     });
   } catch (err) {
     res.status(500).send("Error fetching flights for landing page: " + err.message);

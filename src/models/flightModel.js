@@ -9,6 +9,11 @@ const flightSchema = new mongoose.Schema({
     trim: true,
     uppercase: true
   },
+  airlineName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   origin: {
     type: String,
     required: true,
@@ -26,8 +31,12 @@ const flightSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  schedule: {
-    type: String, // Using String for flexibility (e.g., "08:00 Daily")
+  departureTime: {
+    type: String,
+    required: true
+  },
+  arrivalTime: {
+    type: String,
     required: true
   },
   aircraftType: {

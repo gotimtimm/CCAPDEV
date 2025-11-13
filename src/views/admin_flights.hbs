@@ -8,11 +8,13 @@
       <thead class="table-dark">
         <tr>
           <th>Flight No</th>
+          <th>Airline Name</th>
           <th>Origin</th>
           <th>Destination</th>
           <th>Price</th>
           <th>Schedule</th>
           <th>Aircraft Type</th>
+    
           <th>Seat Capacity</th>
           <th>Actions</th>
         </tr>
@@ -21,10 +23,11 @@
         {{#each flights}}
         <tr>
           <td>{{this.flightNumber}}</td>
+          <td>{{this.airlineName}}</td>
           <td>{{this.origin}}</td>
           <td>{{this.destination}}</td>
           <td>₱{{this.basePrice}}</td>
-          <td>{{this.schedule}}</td>
+          <td>{{this.departureTime}} - {{this.arrivalTime}}</td>
           <td>{{this.aircraftType}}</td>
           <td>{{this.seatCapacity}}</td>
           <td>
@@ -32,6 +35,7 @@
             
             <form action="/admin/flights/delete/{{this._id}}" method="POST" class="d-inline">
               <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+     
             </form>
           </td>
         </tr>
@@ -42,5 +46,6 @@
 </div>
 
 {{#if (eq flights.length 0)}}
-  <p class="text-center mt-3">No flights found. <a href="/admin/flights/new">Add one!</a></p>
+  <p class="text-center mt-3">No flights found.
+<a href="/admin/flights/new">Add one!</a></p>
 {{/if}}
