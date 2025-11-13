@@ -49,4 +49,46 @@ router.post('/cancel/:id', async (req, res) => {
   }
 });
 
+router.get('/my-reservations', async (req, res) => {
+  try {
+    const reservations = await Reservation.find({}).populate('flightId');
+
+    res.render('my_reservations', { 
+      reservations: reservations
+    });
+  } catch (err) {
+    console.error("Error fetching reservations:", err);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.get('/edit/:id', async (req, res) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id).populate('flightId');
+    res.render('edit_reservation', { 
+      reservation: reservation
+    });
+  } catch (err) {
+    console.error("Error fetching reservation:", err);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.post('/update/:id', async (req, res) => {
+  try {
+    const { passengerName, mealOption, extraBaggage } = req.body;
+
+    await Reservation.findByIdAndUpdate(req.params.id, {
+      passengerName,
+      mealOption,
+      extraBaggage
+    });
+
+    res.redirect('/reservations/my-reservations');
+  } catch (err) {
+    console.error("Error updating reservation:", err);
+    res.status(500).send('Server Error');
+  }
+});
+
 module.exports = router;
