@@ -21,6 +21,11 @@
       </div>
 
       <div class="mb-3">
+        <label for="basePrice" class="form-label">Price (PHP)</label>
+        <input type="number" class="form-control" id="basePrice" name="basePrice" value="{{flight.basePrice}}" min="0" required>
+      </div>
+
+      <div class="mb-3">
         <label for="schedule" class="form-label">Schedule</label>
         <input type="text" class="form-control" id="schedule" name="schedule" value="{{flight.schedule}}" required>
       </div>

@@ -2,7 +2,7 @@
 
 <div class="card shadow-sm">
   <div class="card-body">
-    <form action="/admin/flights/update/{{flight._id}}" method="POST">
+    <form action="/admin/flights/create" method="POST">
       
       <div class="mb-3">
         <label for="flightNumber" class="form-label">Flight Number</label>
@@ -21,11 +21,17 @@
       </div>
 
       <div class="mb-3">
+        <label for="basePrice" class="form-label">Price (PHP)</label>
+        <input type="number" class="form-control" id="basePrice" name="basePrice" value="{{flight.basePrice}}" min="0" required>
+      </div>
+
+      <div class="mb-3">
         <label for="schedule" class="form-label">Schedule</label>
         <input type="text" class="form-control" id="schedule" name="schedule" value="{{flight.schedule}}" required>
       </div>
 
-      <div class="row">
+   
+    <div class="row">
         <div class="col-md-8 mb-3">
           <label for="aircraftType" class="form-label">Aircraft Type</label>
           <input type="text" class="form-control" id="aircraftType" name="aircraftType" value="{{flight.aircraftType}}" required>
@@ -38,7 +44,7 @@
       
       <hr>
       
-      <button type="submit" class="btn btn-success">Update Flight</button>
+      <button type="submit" class="btn btn-primary">Add Flight</button>
       <a href="/admin/flights" class="btn btn-secondary">Cancel</a>
       
     </form>

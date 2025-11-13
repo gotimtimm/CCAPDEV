@@ -1,4 +1,3 @@
-
 // flightModel.js
 const mongoose = require('mongoose');
 
