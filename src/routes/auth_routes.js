@@ -2,17 +2,14 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 
-// Register page
 router.get('/register', (req, res) => {
   res.render('register', { layout: false });
 });
 
-// Login page
 router.get('/login', (req, res) => {
   res.render('login', { layout: false, error: null });
 });
 
-// Register processing
 router.post('/register', async (req, res) => {
   try {
     const { fullName, email, passportNumber } = req.body;
@@ -45,7 +42,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login processing (simple email-based for Milestone 2)
 router.post('/login', async (req, res) => {
   try {
     const { email } = req.body;
@@ -72,10 +68,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Logout
 router.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
 
 module.exports = router;
+
