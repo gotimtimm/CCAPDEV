@@ -10,25 +10,26 @@
     <h3>User Management</h3>
     
     <table class="table">
-      <thead>
-        <tr>
-          <th>User ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each users}}
-        <tr>
-          <td>{{this._id}}</td>
-          <td>{{this.name}}</td>
-          <td>{{this.email}}</td>
-          <td><button class="btn btn-sm btn-warning">Edit</button></td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
-  </div>
-</body>
-</html>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Passport Number</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{this.fullName}}</td>
+        <td>{{this.email}}</td>
+        <td>{{this.passportNumber}}</td>
+        <td>
+          <form action="/admin/users/delete/{{this._id}}" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
