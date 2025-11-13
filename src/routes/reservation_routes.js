@@ -4,7 +4,6 @@ const Reservation = require('../models/reservation');
 const Flight = require('../models/flight');
 const { isAuthenticated } = require('../middleware/auth');
 
-// GET reservation form
 router.get('/reservation-form', isAuthenticated, async (req, res) => {
   try {
     const flightId = req.query.flightId;
@@ -27,12 +26,10 @@ router.get('/reservation-form', isAuthenticated, async (req, res) => {
   }
 });
 
-// CREATE reservation
 router.post('/book', isAuthenticated, async (req, res) => {
   try {
     const { flightId, passengerName, passengerEmail, passengerPassport, mealOption, extraBaggage, selectedSeat, totalCost } = req.body;
     
-    // Check if seat is already taken
     const existingReservation = await Reservation.findOne({
       flightId,
       selectedSeat,
@@ -65,7 +62,6 @@ router.post('/book', isAuthenticated, async (req, res) => {
   }
 });
 
-// READ user reservations
 router.get('/my-reservations', isAuthenticated, async (req, res) => {
   try {
     const reservations = await Reservation.find({ userId: req.session.user.id }).populate('flightId');
@@ -80,12 +76,10 @@ router.get('/my-reservations', isAuthenticated, async (req, res) => {
   }
 });
 
-// UPDATE reservation form
 router.get('/edit/:id', isAuthenticated, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate('flightId');
     
-    // Check if reservation belongs to user
     if (reservation.userId.toString() !== req.session.user.id) {
       return res.status(403).send('Access denied');
     }
@@ -100,12 +94,10 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-// UPDATE reservation (with seat modification)
 router.post('/update/:id', isAuthenticated, async (req, res) => {
   try {
     const { passengerName, passengerEmail, passengerPassport, mealOption, extraBaggage, selectedSeat } = req.body;
 
-    // Check if new seat is available
     if (selectedSeat) {
       const reservation = await Reservation.findById(req.params.id);
       const existingReservation = await Reservation.findOne({
@@ -136,7 +128,6 @@ router.post('/update/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-// DELETE reservation (cancel)
 router.post('/cancel/:id', isAuthenticated, async (req, res) => {
   try {
     const reservationId = req.params.id;
@@ -146,7 +137,6 @@ router.post('/cancel/:id', isAuthenticated, async (req, res) => {
       return res.status(404).send('Reservation not found');
     }
     
-    // Check if reservation belongs to user
     if (reservation.userId.toString() !== req.session.user.id) {
       return res.status(403).send('Access denied');
     }
