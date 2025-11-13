@@ -14,28 +14,37 @@
 <div class="container">
 <a class="navbar-brand fw-bold" href="/">Airline Ticketing System</a>
 
-  <!-- Toggler button for collapsible sidebar/menu -->
   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <!-- Collapsible content -->
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ms-auto">
-      <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-      <li class="nav-item"><a class="nav-link" href="/my-reservations">My Reservations</a></li>
-      <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+      <li class="nav-item"><a class="nav-link" href="/">Search Flights</a></li>
+      
+      {{#if isLoggedIn}}
+        <li class="nav-item"><a class="nav-link" href="/my-reservations">My Reservations</a></li>
+        <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
 
-      <!-- Admin Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Admin
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-          <li><a class="dropdown-item" href="/admin/users">User Management</a></li>
-          <li><a class="dropdown-item" href="/admin/flights">Flight Management</a></li>
-        </ul>
-      </li>
+        {{#if isAdmin}}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Admin
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+              <li><a class="dropdown-item" href="/admin/users">User Management</a></li>
+              <li><a class="dropdown-item" href="/admin/flights">Flight Management</a></li>
+            </ul>
+          </li>
+        {{/if}}
+
+        <li class="nav-item"><a class="nav-link btn btn-sm btn-danger text-white ms-2" href="/logout">Logout</a></li>
+
+      {{else}}
+        <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+      {{/if}}
+
     </ul>
   </div>
 </div>

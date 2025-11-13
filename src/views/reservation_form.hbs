@@ -100,7 +100,7 @@
       font-size: 16px;
       cursor: pointer;
       margin-top: 50px;  
-      margin-bottom: 50px;  
+      margin-bottom: 50px;
     }
 
     .back-button {
@@ -112,15 +112,16 @@
       border-radius: 8px;
       text-decoration: none;
       font-size: 16px;
-      cursor: pointer; 
+      cursor: pointer;
     }
 
     #bg {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0; left: 0; right: 0;
+      bottom: 0;
       background-position: center;
       background-repeat: no-repeat;
-      background-size: 120%; /* make it slightly larger than viewport */
+      background-size: 120%;
       filter: blur(10px);
       z-index: -1;
     }
@@ -134,36 +135,54 @@
   <div id="bg"></div>
   <div class="content-container">
     <h1>Book Your Flight 🔖</h1>
+    <div class="alert alert-info">
+      Booking Flight <strong>{{flight.flightNumber}}</strong> ({{flight.origin}} &rarr; {{flight.destination}}) on <strong>{{reservedDate}}</strong> for ₱{{flight.basePrice}}
+    </div>
 
-    <form id="reservationForm">
+    <form id="reservationForm" action="/reservation-form/create" method="POST">
+      <input type="hidden" id="flightId" name="flightId" value="{{flight._id}}"> 
+      <input type="hidden" id="reservedDate" name="reservedDate" value="{{reservedDate}}">
+
       <label>Full Name</label>
-      <input type="text" id="name" placeholder="Enter full name" required>
+      <input type="text" id="name" name="fullName" placeholder="Enter full name" required>
 
       <label>Email</label>
-      <input type="email" id="email" placeholder="Enter email" required>
+      <input type="email" id="email" name="email" placeholder="Enter email" required>
 
       <label>Passport Number</label>
-      <input type="text" id="passport" placeholder="Enter passport number" required>
+      <input type="text" id="passport" name="passportNumber" placeholder="Enter passport number" required>
 
       <label>Meal Option</label>
-      <select id="meal">
-        <option value="0">Chips (PHP 0)</option>
+      <select id="meal" name="mealOption">
+        <option 
+        value="0">Chips (PHP 0)</option>
         <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
         <option value="270">Sausage with Hashbrown (PHP 270)</option>
         <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
         <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
       </select>
 
-      <label>Extra Baggage (PHP 500 per bag)</label>
-      <input type="number" id="baggage" value="0" min="0">
+      <label>Extra Baggage Weight (KG)</label>
+      <select id="baggage" name="extraBaggage" class="form-select">
+        <option value="2">2 kg (Free)</option>
+        <option value="5">5 kg (₱500)</option>
+        <option value="10">10 kg (₱1,000)</option>
+        <option value="15">15 kg (₱1,500)</option>
+        <option value="20">20 kg (₱2,000)</option>
+      </select>
 
       <label>Select Your Seat</label>
+     
       <div class="seat-map" id="seatMap"></div>
 
       <div class="summary-box">
         <h3>Reservation Summary</h3>
-        <p id="summary">Base Fare: PHP 5,000<br>Total: PHP 5,000</p>
+        <p id="summary">Base Fare: PHP {{flight.basePrice}}<br>Total: PHP {{flight.basePrice}}</p>
       </div>
+
+      <input type="hidden" id="selectedSeatHidden" name="selectedSeat">
+      <input type="hidden" id="totalPriceHidden" name="totalPrice">
+
 
       <button type="submit">Confirm Reservation ✈️</button>
 
@@ -178,12 +197,12 @@
       "/images/elnido.jpg",
       "/images/baguio.jpg",
       "/images/mayon.jpg",
+    
       "/images/ilocos.jpg",
       "/images/bohol.jpg"
     ];
 
     const randomImage = images[Math.floor(Math.random() * images.length)];
-
     document.body.style.background = `url('${randomImage}') no-repeat center center fixed`;
     document.body.style.backgroundSize = "cover";
     document.getElementById("bg").style.background = `url('${randomImage}') center/cover no-repeat fixed`;
@@ -191,13 +210,24 @@
 
   <script>
     $(document).ready(function(){
-      let baseFare = 5000;
+      // Set base fare from server-side data
+      let baseFare = parseInt("{{flight.basePrice}}" || 5000); 
       let selectedSeat = null;
+
+      // Define baggage tiers for pricing calculation
+      const baggageTiers = [
+        { weight: 2, cost: 0 },
+        { weight: 5, cost: 500 },
+        { weight: 10, cost: 1000 },
+        { weight: 15, cost: 1500 },
+        { weight: 20, cost: 2000 }
+      ];
       
       for(let row = 1; row <= 4; row++){
         for(let col = 1; col <= 15; col++){
           let seatNum = String.fromCharCode(64 + row) + col; // A1, A2, ..., D15
           $("#seatMap").append(`<div class="seat" data-seat="${seatNum}">${seatNum}</div>`);
+        
         }
 
         if (row == 2){
@@ -211,6 +241,7 @@
       $(document).on("click", ".seat", function(){
         if($(this).hasClass("occupied")) return;
         $(".seat.selected").removeClass("selected");
+       
         $(this).addClass("selected");
         selectedSeat = $(this).data("seat");
         updateSummary();
@@ -219,28 +250,46 @@
     
       function updateSummary(){
         let mealCost = parseInt($("#meal").val());
-        let baggageCost = parseInt($("#baggage").val()) * 500;
+        
+        // Get the selected baggage weight (in KG)
+        let selectedWeightKg = parseInt($("#baggage").val());
+        // Find the corresponding cost based on the weight tiers
+        let baggageCost = baggageTiers.find(tier => tier.weight === selectedWeightKg)?.cost || 0;
+        
         let total = baseFare + mealCost + baggageCost;
+        
+        // Update hidden fields for submission
+        $("#selectedSeatHidden").val(selectedSeat);
+        $("#totalPriceHidden").val(total); 
+
         $("#summary").html(`
           Base Fare: PHP ${baseFare}<br>
           Meal Cost: PHP ${mealCost}<br>
-          Baggage: PHP ${baggageCost}<br>
+          Baggage: PHP ${baggageCost} (${selectedWeightKg} kg)<br>
           Seat: ${selectedSeat || "Not selected"}<br>
           <b>Total: PHP ${total}</b>
         `);
       }
 
+      // Initial summary update
+      updateSummary();
+      
       $("#meal, #baggage").on("change keyup", updateSummary);
-
-   
+      
       $("#reservationForm").submit(function(e){
-        e.preventDefault();
-        alert("Reservation confirmed!\n\n" + $("#summary").text());
-        this.reset();
-        $("#summary").html("Base Fare: PHP 5,000<br>Total: PHP 5,000");
-        $(".seat.selected").removeClass("selected");
+        if (!selectedSeat) {
+            e.preventDefault();
+            alert("Please select a seat before confirming your reservation.");
+            return false;
+        }
+        
+        // Final update of hidden fields before submission
+        updateSummary();
+        
+        // The form now submits to the POST route for creation
+        return true; 
       });
     });
   </script>
 </body>
-</html> 
+</html>

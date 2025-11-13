@@ -40,7 +40,9 @@ router.post('/create', async (req, res) => {
       origin: req.body.origin,
       destination: req.body.destination,
       basePrice: req.body.basePrice,
+      departureDate: req.body.departureDate,
       departureTime: req.body.departureTime,
+      arrivalDate: req.body.arrivalDate,  
       arrivalTime: req.body.arrivalTime,
       aircraftType: req.body.aircraftType,
       seatCapacity: req.body.seatCapacity

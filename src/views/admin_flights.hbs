@@ -12,8 +12,7 @@
           <th>Origin</th>
           <th>Destination</th>
           <th>Price</th>
-          <th>Schedule</th>
-          <th>Aircraft Type</th>
+          <th>Departure</th> <th>Arrival</th>   <th>Aircraft Type</th>
     
           <th>Seat Capacity</th>
           <th>Actions</th>
@@ -27,12 +26,12 @@
           <td>{{this.origin}}</td>
           <td>{{this.destination}}</td>
           <td>₱{{this.basePrice}}</td>
-          <td>{{this.departureTime}} - {{this.arrivalTime}}</td>
-          <td>{{this.aircraftType}}</td>
+          <td>{{this.departureDate}} @ {{this.departureTime}}</td> <td>{{this.arrivalDate}} @ {{this.arrivalTime}}</td>     <td>{{this.aircraftType}}</td>
           <td>{{this.seatCapacity}}</td>
           <td>
             <a href="/admin/flights/edit/{{this._id}}" class="btn btn-sm btn-warning">Edit</a>
             
+           
             <form action="/admin/flights/delete/{{this._id}}" method="POST" class="d-inline">
               <button type="submit" class="btn btn-sm btn-danger">Delete</button>
      

@@ -1,9 +1,18 @@
 <div class="container mt-4">
   <h3>My Profile</h3>
-  <form>
-    <div class="mb-3"><label>Full Name</label><input type="text" class="form-control" value="Juan Dela Cruz"></div>
-    <div class="mb-3"><label>Email</label><input type="email" class="form-control" value="juan@example.com"></div>
-    <div class="mb-3"><label>Passport Number</label><input type="text" class="form-control" value="P1234567"></div>
+  <form action="/profile/update" method="POST">
+    <div class="mb-3">
+        <label>Full Name</label>
+        <input type="text" class="form-control" name="fullName" value="{{user.fullName}}" required>
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" class="form-control" name="email" value="{{user.email}}" required>
+    </div>
+    <div class="mb-3">
+        <label>Passport Number</label>
+        <input type="text" class="form-control" name="passportNumber" value="{{user.passportNumber}}" required>
+    </div>
     <button type="submit" class="btn btn-primary">Update Profile</button>
   </form>
 </div>
