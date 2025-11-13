@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 // Register page
@@ -16,7 +15,7 @@ router.get('/login', (req, res) => {
 // Register processing
 router.post('/register', async (req, res) => {
   try {
-    const { fullName, email, password, passportNumber } = req.body;
+    const { fullName, email, passportNumber } = req.body;
     
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -26,13 +25,9 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = new User({
       fullName,
       email,
-      password: hashedPassword,
       passportNumber
     });
 
@@ -50,24 +45,16 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login processing
+// Login processing (simple email-based for Milestone 2)
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email } = req.body;
     
     const user = await User.findOne({ email });
     if (!user) {
       return res.render('login', { 
         layout: false, 
-        error: 'Invalid email or password' 
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.render('login', { 
-        layout: false, 
-        error: 'Invalid email or password' 
+        error: 'User not found' 
       });
     }
 
@@ -90,8 +77,5 @@ router.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
-
-module.exports = router;
-
 
 module.exports = router;
