@@ -1,10 +1,13 @@
 const express = require('express');
 const { create } = require('express-handlebars');
 const mongoose = require('mongoose');
+const session = require('express-session'); 
 
 const flightRoutes = require('./src/routes/flight_routes');
 const reservationRoutes = require('./src/routes/reservation_routes');
 const userRoutes = require('./src/routes/user_routes');
+const authRoutes = require('./src/routes/auth_routes'); 
+const adminRoutes = require('./src/routes/admin_routes'); 
 
 const Flight = require('./src/models/flight');
 const Reservation = require('./src/models/reservation');
@@ -21,6 +24,20 @@ mongoose.connect(MONGO_URI)
 
 app.use(express.static('public')); 
 app.use(express.urlencoded({ extended: true })); 
+app.use(express.static('public')); 
+app.use(express.urlencoded({ extended: true })); 
+
+app.use(session({
+  secret: 'milestone2-session',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
 const hbs = create({
   extname: '.hbs',
@@ -47,49 +64,8 @@ app.get('/', async (req, res) => {
   }
 });
 
-app.get('/my-reservations', async (req, res) => {
-  try {
-    const reservations = await Reservation.find({}).populate('flightId').lean(); 
-    res.render('my_reservations', { 
-      layout: 'main',
-      reservations: reservations
-    });
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
-
-app.get('/reservation-form', (req, res) => {
-  res.render('reservation_form', { 
-    layout: 'main',
-    flightId: req.query.flightId 
-  });
-});
-
-app.get('/profile', async (req, res) => {
-  try {
-    const user = await User.findOne({}).lean(); 
-    res.render('profile', { 
-      layout: 'main',
-      user: user
-    });
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
-
-app.get('/admin/users', async (req, res) => {
-  try {
-    const users = await User.find({}).lean(); 
-    res.render('admin_users', { 
-      layout: 'main',
-      users: users
-    });
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
-
+app.use('/auth', authRoutes); 
+app.use('/admin', adminRoutes); 
 app.use('/flights', flightRoutes);
 app.use('/reservations', reservationRoutes);
 app.use('/user', userRoutes);
