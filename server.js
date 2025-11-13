@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { engine } = require('express-handlebars');
-const flightRoutes = require('./routes/flightRoutes');
+const flightRoutes = require('./src/routes/flightRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 // --- 1. MONGODB CONNECTION ---
 // !! IMPORTANT !!
 // Replace this with your actual MongoDB connection string
-const MONGO_URI = "YOUR_MONGODB_CONNECTION_STRING_GOES_HERE";
+const MONGO_URI = "mongodb://localhost:27017/flightDB";
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log("MongoDB Connected..."))
