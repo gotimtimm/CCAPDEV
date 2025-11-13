@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/user');
 const { isAuthenticated } = require('../middleware/auth');
 
-// GET profile page
 router.get('/profile', isAuthenticated, async (req, res) => {
   try {
     const user = await User.findById(req.session.user.id);
@@ -17,7 +16,6 @@ router.get('/profile', isAuthenticated, async (req, res) => {
   }
 });
 
-// UPDATE profile
 router.post('/update', isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user.id;
@@ -30,7 +28,6 @@ router.post('/update', isAuthenticated, async (req, res) => {
       passportNumber
     });
     
-    // Update session data
     req.session.user.fullName = fullName;
     req.session.user.email = email;
     
