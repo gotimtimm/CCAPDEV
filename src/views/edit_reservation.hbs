@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Reservation</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-4">
+    <h3>Edit Reservation</h3>
+    
+    <form action="/reservations/update/{{reservation._id}}" method="POST">
+      <input type="hidden" name="flightId" value="{{reservation.flightId._id}}">
+      
+      <div class="mb-3">
+        <label>Passenger Name</label>
+        <input type="text" name="passengerName" class="form-control" value="{{reservation.passengerName}}" required>
+      </div>
+      
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="passengerEmail" class="form-control" value="{{reservation.passengerEmail}}" required>
+      </div>
+      
+      <div class="mb-3">
+        <label>Passport Number</label>
+        <input type="text" name="passengerPassport" class="form-control" value="{{reservation.passengerPassport}}" required>
+      </div>
+      
+      <div class="mb-3">
+        <label>Meal Option</label>
+        <select name="mealOption" class="form-control">
+          <option value="None" {{#eq reservation.mealOption "None"}}selected{{/eq}}>None (PHP 0)</option>
+          <option value="Vegetarian" {{#eq reservation.mealOption "Vegetarian"}}selected{{/eq}}>Vegetarian (PHP 150)</option>
+          <option value="Kosher" {{#eq reservation.mealOption "Kosher"}}selected{{/eq}}>Kosher (PHP 270)</option>
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label>Extra Baggage</label>
+        <select name="extraBaggage" class="form-control">
+          <option value="0" {{#eq reservation.extraBaggage 0}}selected{{/eq}}>0 bags (PHP 0)</option>
+          <option value="1" {{#eq reservation.extraBaggage 1}}selected{{/eq}}>1 bag (PHP 500)</option>
+          <option value="2" {{#eq reservation.extraBaggage 2}}selected{{/eq}}>2 bags (PHP 1000)</option>
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label>Selected Seat: {{reservation.selectedSeat}}</label>
+        <p class="text-muted">Seat cannot be changed after booking</p>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Update Reservation</button>
+      <a href="/reservations/my-reservations" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</body>
+</html>
