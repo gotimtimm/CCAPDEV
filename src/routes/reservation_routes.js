@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Reservation = require('../models/reservation');
 const Flight = require('../models/flight');
+const User = require('../models/user');
 const { isAuthenticated } = require('../middleware/auth');
 
 router.get('/reservation-form', isAuthenticated, async (req, res) => {
