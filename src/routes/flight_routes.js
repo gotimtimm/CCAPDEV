@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Flight = require('../models/flight');
 
-// READ all flights
 router.get('/', async (req, res) => {
   try {
     const flights = await Flight.find({}).lean();
@@ -17,7 +16,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// CREATE a new flight
 router.post('/add', async (req, res) => {
   try {
     const { flightNumber, origin, destination, schedule, aircraftType, seatCapacity } = req.body;
@@ -39,7 +37,6 @@ router.post('/add', async (req, res) => {
   }
 });
 
-// DELETE a flight
 router.post('/delete/:id', async (req, res) => {
   try {
     const flightId = req.params.id;
@@ -51,7 +48,6 @@ router.post('/delete/:id', async (req, res) => {
   }
 });
 
-// GET route to show the edit page
 router.get('/edit/:id', async (req, res) => {
   try {
     const flight = await Flight.findById(req.params.id).lean();
@@ -65,7 +61,6 @@ router.get('/edit/:id', async (req, res) => {
   }
 });
 
-// POST route to save the updated flight
 router.post('/update/:id', async (req, res) => {
   try {
     const flightId = req.params.id;
