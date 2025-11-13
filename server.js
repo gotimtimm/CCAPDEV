@@ -24,8 +24,6 @@ mongoose.connect(MONGO_URI)
 
 app.use(express.static('public')); 
 app.use(express.urlencoded({ extended: true })); 
-app.use(express.static('public')); 
-app.use(express.urlencoded({ extended: true })); 
 
 app.use(session({
   secret: 'milestone2-session',
