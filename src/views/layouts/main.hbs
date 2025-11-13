@@ -15,10 +15,18 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="/my-reservations">My Reservations</a></li>
-          <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-          <li class="nav-item"><a class="nav-link" href="/admin/users">Admin-Users</a></li>
-          <li class="nav-item"><a class="nav-link" href="/flights">Admin-Flights</a></li>
+          {{#if user}}
+            <li class="nav-item"><a class="nav-link" href="/reservations/my-reservations">My Reservations</a></li>
+            <li class="nav-item"><a class="nav-link" href="/user/profile">Profile</a></li>
+            {{#if user.isAdmin}}
+              <li class="nav-item"><a class="nav-link" href="/admin/users">Admin-Users</a></li>
+              <li class="nav-item"><a class="nav-link" href="/flights">Admin-Flights</a></li>
+            {{/if}}
+            <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout ({{user.fullName}})</a></li>
+          {{else}}
+            <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="/auth/register">Register</a></li>
+          {{/if}}
         </ul>
       </div>
     </div>
