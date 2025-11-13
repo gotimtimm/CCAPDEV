@@ -21,6 +21,11 @@ const flightSchema = new mongoose.Schema({
     trim: true,
     uppercase: true
   },
+  basePrice: {
+    type: Number,
+    required: true,
+    min: 0
+  },
   schedule: {
     type: String, // Using String for flexibility (e.g., "08:00 Daily")
     required: true
