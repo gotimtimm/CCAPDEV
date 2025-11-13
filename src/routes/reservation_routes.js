@@ -9,6 +9,7 @@ router.get('/reservation-form', isAuthenticated, async (req, res) => {
   try {
     const flightId = req.query.flightId;
     const flight = await Flight.findById(flightId);
+    const user = await User.findById(req.session.user.id);
     
     if (!flight) {
       return res.status(404).send('Flight not found');
@@ -17,6 +18,7 @@ router.get('/reservation-form', isAuthenticated, async (req, res) => {
     res.render('reservation_form', { 
       flightId: flightId,
       flight: flight,
+      user: user,
       layout: 'main'
     });
   } catch (err) {
@@ -43,14 +45,14 @@ router.post('/book', isAuthenticated, async (req, res) => {
     
     const newReservation = new Reservation({
       flightId,
+      userId: req.session.user.id,
       passengerName,
       passengerEmail,
       passengerPassport,
       mealOption,
       extraBaggage: parseInt(extraBaggage),
       selectedSeat,
-      totalCost: parseInt(totalCost),
-      userId: req.session.user.id // Link reservation to user
+      totalCost
     });
     
     await newReservation.save();
@@ -98,7 +100,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-// UPDATE reservation
+// UPDATE reservation (with seat modification)
 router.post('/update/:id', isAuthenticated, async (req, res) => {
   try {
     const { passengerName, passengerEmail, passengerPassport, mealOption, extraBaggage, selectedSeat } = req.body;
@@ -110,7 +112,7 @@ router.post('/update/:id', isAuthenticated, async (req, res) => {
         flightId: reservation.flightId,
         selectedSeat,
         bookingStatus: 'Confirmed',
-        _id: { $ne: req.params.id } // Exclude current reservation
+        _id: { $ne: req.params.id }
       });
       
       if (existingReservation) {
