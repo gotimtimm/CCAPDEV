@@ -14,7 +14,8 @@
         <input type="text" class="form-control" id="airlineName" name="airlineName" required>
       </div>
       
-      <div class="row">
+  
+     <div class="row">
         <div class="col-md-6 mb-3">
           <label for="origin" class="form-label">Origin</label>
           <select class="form-control" id="origin" name="origin" required>
@@ -23,6 +24,7 @@
             {{/each}}
           </select>
         </div>
+ 
         <div class="col-md-6 mb-3">
           <label for="destination" class="form-label">Destination</label>
           <select class="form-control" id="destination" name="destination" required>
@@ -33,6 +35,7 @@
         </div>
       </div>
 
+ 
       <div class="mb-3">
         <label for="basePrice" class="form-label">Price (PHP)</label>
         <input type="number" class="form-control" id="basePrice" name="basePrice" value="{{flight.basePrice}}" min="0" required>
@@ -40,10 +43,22 @@
 
       <div class="row">
         <div class="col-md-6 mb-3">
+          <label for="departureDate" class="form-label">Departure Date</label>
+          <input type="date" class="form-control" id="departureDate" name="departureDate" required>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="arrivalDate" class="form-label">Arrival Date</label>
+          <input type="date" class="form-control" id="arrivalDate" name="arrivalDate" required>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-6 mb-3">
           <label for="departureTime" class="form-label">Departure Time</label>
           <input type="time" class="form-control" id="departureTime" name="departureTime" required>
         </div>
-        <div class="col-md-6 mb-3">
+        <div 
+class="col-md-6 mb-3">
           <label for="arrivalTime" class="form-label">Arrival Time</label>
           <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" required>
         </div>
@@ -54,7 +69,8 @@
         <div class="col-md-8 mb-3">
           <label for="aircraftType" class="form-label">Aircraft Type</label>
           <input type="text" class="form-control" id="aircraftType" name="aircraftType" value="{{flight.aircraftType}}" required>
-        </div>
+       
+  </div>
         <div 
 class="col-md-4 mb-3">
           <label for="seatCapacity" class="form-label">Seat Capacity</label>
@@ -67,6 +83,7 @@ class="col-md-4 mb-3">
       <button type="submit" class="btn btn-primary">Add Flight</button>
       <a href="/admin/flights" class="btn btn-secondary">Cancel</a>
       
-    </form>
+  
+   </form>
   </div>
 </div>
