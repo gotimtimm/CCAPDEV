@@ -7,6 +7,9 @@ const morgan = require('morgan');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
 
+// Import of Logger
+const logger = require('./src/utils/logger'); 
+
 const flightRoutes = require('./src/routes/flightroutes');
 const Flight = require('./src/models/flightModel');
 const Reservation = require('./src/models/reservationModel');
@@ -15,17 +18,16 @@ const User = require('./src/models/userModel');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- CONFIGURATION ---
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'default_secret'; 
 const MONGO_URI = "mongodb://localhost:27017/flightDB";
 
-// Helper function for safe number parsing
+// Number Parsing
 const safeParseInt = (value, defaultValue = 0) => {
     const parsed = parseInt(value);
     return isNaN(parsed) ? defaultValue : parsed;
 };
 
-// --- 1. MONGODB CONNECTION ---
+// MonggoDB Connection
 mongoose.connect(MONGO_URI)
   .then(async () => {
       console.log("MongoDB Connected...");
@@ -41,7 +43,6 @@ async function ensureDemoAdminExists() {
     
     if (!user) {
         console.log("Creating demo admin account...");
-        // CREATE NEW ADMIN
         user = new User({
             fullName: "Admin Account",
             email: adminEmail,
@@ -58,8 +59,8 @@ async function ensureDemoAdminExists() {
     console.log("Demo admin ready (admin@lasalle.ph / admin).");
 }
 
-// --- 2. MIDDLEWARE ---
-app.use(morgan('dev'));
+// Middleware
+app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
@@ -70,7 +71,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        maxAge: 1000 * 60 * 60 * 24, 
         httpOnly: true 
     }
 }));
@@ -84,7 +85,7 @@ app.use(async (req, res, next) => {
         try {
             res.locals.currentUser = await User.findById(req.session.userId).lean();
         } catch (err) {
-            console.error("Error loading session user:", err);
+            logger.error(`Error loading session user: ${err.message}`); 
             res.locals.currentUser = null;
         }
     } else {
@@ -109,7 +110,7 @@ const ensureAdmin = (req, res, next) => {
     next();
 };
 
-// --- 3. HANDLEBARS SETUP ---
+// Handlebars Setup
 app.engine('hbs', engine({
   extname: '.hbs',
   defaultLayout: 'main',
@@ -123,8 +124,7 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs');
 app.set('views', './src/views');
 
-// --- 4. AUTH ROUTES ---
-
+// AUTH Routes
 // Register Page
 app.get('/register', (req, res) => {
     res.render('register', { pageTitle: "Register" });
@@ -139,7 +139,7 @@ app.post('/register', async (req, res) => {
             fullName, 
             email, 
             passportNumber, 
-            password: password,
+            password: password, 
             role: 'user' 
         });
         await newUser.save();
@@ -147,9 +147,11 @@ app.post('/register', async (req, res) => {
         req.session.userId = newUser._id;
         req.session.userRole = newUser.role;
         
+        logger.info(`New user registered: ${email}`);
+
         res.redirect('/profile'); 
     } catch (err) {
-        console.error("Registration Error:", err);
+        logger.error(`Registration Error: ${err.message}`); 
         let errorMessage = "Registration failed.";
         if (err.code === 11000) errorMessage = "Email or Passport already exists.";
         res.render('register', { errorMessage });
@@ -181,13 +183,15 @@ app.post('/login', async (req, res) => {
         req.session.userId = user._id;
         req.session.userRole = user.role;
 
+        logger.info(`User logged in: ${email}`);
+
         if (user.role === 'admin') {
             res.redirect('/admin/flights');
         } else {
             res.redirect('/profile');
         }
     } catch (err) {
-        console.error("Login Error:", err);
+        logger.error(`Login Error: ${err.message}`); 
         res.status(500).send("Login error: " + err.message);
     }
 });
@@ -195,14 +199,12 @@ app.post('/login', async (req, res) => {
 // Logout Logic
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
-        if (err) console.error("Logout error:", err);
+        if (err) logger.error("Logout error:", err);
         res.redirect('/');
     });
 });
 
-
-// --- 5. CORE ROUTES ---
-
+// Core Routes
 // Admin Routes (Protected by ensureAdmin)
 app.use('/admin/flights', ensureAdmin, flightRoutes); 
 
@@ -284,9 +286,12 @@ app.post('/reservation-form/create', ensureAuthenticated, async (req, res) => {
         });
 
         await newReservation.save();
+        
+        logger.info(`Reservation created by ${user.email} for flight ${flightId}`);
+
         res.redirect('/my-reservations');
     } catch (err) {
-        console.error("Create Reservation Error:", err);
+        logger.error(`Create Reservation Error: ${err.message}`); 
         res.status(500).send("Error creating reservation: " + err.message);
     }
 });
@@ -306,18 +311,17 @@ app.get('/my-reservations', ensureAuthenticated, async (req, res) => {
             reservations: reservations
         });
     } catch (err) {
-        console.error("My Reservations Error:", err);
+        logger.error(`My Reservations Error: ${err.message}`);
         res.status(500).send("Error fetching reservations.");
     }
 });
 
-// Update Reservation (Protected)
+// Update Reservation 
 app.post('/my-reservations/update/:id', ensureAuthenticated, async (req, res) => { 
     try {
         const reservationId = req.params.id;
         const { selectedSeat, mealOption, extraBaggage, totalPrice } = req.body; 
 
-        // Security Note: Ideally check if (reservation.user == req.session.userId)
         await Reservation.findByIdAndUpdate(reservationId, {
             selectedSeat,
             mealOption: safeParseInt(mealOption),
@@ -327,6 +331,7 @@ app.post('/my-reservations/update/:id', ensureAuthenticated, async (req, res) =>
 
         res.redirect('/my-reservations'); 
     } catch (err) {
+        logger.error(`Reservation Update Error: ${err.message}`);
         res.status(500).send("Error updating reservation: " + err.message);
     }
 });
@@ -335,13 +340,15 @@ app.post('/my-reservations/update/:id', ensureAuthenticated, async (req, res) =>
 app.post('/my-reservations/cancel/:id', ensureAuthenticated, async (req, res) => { 
     try {
         await Reservation.findByIdAndDelete(req.params.id);
+        logger.info(`Reservation cancelled: ${req.params.id}`);
         res.redirect('/my-reservations');
     } catch (err) {
+        logger.error(`Reservation Cancel Error: ${err.message}`);
         res.status(500).send("Error deleting reservation: " + err.message);
     }
 });
 
-// User Profile (Protected)
+// User Profile
 app.get('/profile', ensureAuthenticated, async (req, res) => { 
     try {
         const user = await User.findById(req.session.userId).lean();
@@ -351,7 +358,7 @@ app.get('/profile', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Update Profile (Protected)
+// Update Profile
 app.post('/profile/update', ensureAuthenticated, async (req, res) => { 
     try {
         const { fullName, email, passportNumber } = req.body;
@@ -360,11 +367,22 @@ app.post('/profile/update', ensureAuthenticated, async (req, res) => {
         }, { new: true, runValidators: true });
         res.redirect('/profile'); 
     } catch (err) {
+        logger.error(`Profile Update Error: ${err.message}`);
         res.status(400).send("Update failed. Email/Passport may be taken.");
     }
 });
 
-// --- 6. START THE SERVER ---
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// [ADDED] Global Error Handler 
+app.use((err, req, res, next) => {
+    logger.error(`System Error: ${err.message} \nStack: ${err.stack}`);
+    res.status(500).send("Something went wrong!");
 });
+
+// Start Server
+if (require.main === module) {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
