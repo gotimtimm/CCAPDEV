@@ -7,6 +7,12 @@ const reservationSchema = new mongoose.Schema({
   email: { type: String, required: true },
   passportNumber: { type: String, required: true },
   
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  
   // Flight Reference
   flight: {
     type: mongoose.Schema.Types.ObjectId,
