@@ -5,6 +5,8 @@ const flightRoutes = require('./src/routes/flightRoutes');
 const Flight = require('./src/models/flightModel');
 const Reservation = require('./src/models/reservationModel');
 const User = require('./src/models/userModel');
+const bcrypt = require('bcrypt');
+const morgan = require('morgan');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,21 +40,26 @@ mongoose.connect(MONGO_URI)
 // Function to ensure demo admin exists (using upsert)
 async function ensureDemoAdminExists() {
     console.log("Ensuring demo admin exists (email: admin@lasalle.ph)...");
-    const adminData = {
-        fullName: "Admin Account",
-        email: DEMO_ADMIN_EMAIL,
-        passportNumber: "ADM000000",
-        password: DEMO_ADMIN_PASSWORD, // Plain text, will be hashed in M3
-        role: "admin"
-    };
     
-    // Find by email, create/update if not found
-    await User.findOneAndUpdate(
-        { email: DEMO_ADMIN_EMAIL },
-        adminData,
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-    ).exec();
-    console.log("Demo admin user ensured.");
+    const adminEmail = "admin@lasalle.ph";
+    const user = await User.findOne({ email: adminEmail });
+
+    if (!user) {
+        const hashedPassword = await bcrypt.hash("admin", 10);
+        
+        const newAdmin = new User({
+            fullName: "Admin Account",
+            email: adminEmail,
+            passportNumber: "ADM000000",
+            password: "admin", 
+            role: "admin"
+        });
+        
+        await newAdmin.save();
+        console.log("Demo admin user created.");
+    } else {
+        console.log("Demo admin user already exists.");
+    }
 }
 // -------------------------
 
@@ -91,6 +98,11 @@ function ensureAdmin(req, res, next) {
     }
     res.status(403).send("Forbidden: Admins only.");
 }
+
+app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static('public'));
 
 // --- 3. HANDLEBARS VIEW ENGINE ---
 app.engine('hbs', engine({
@@ -140,9 +152,15 @@ app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        const user = await User.findOne({ email }).lean();
+        const user = await User.findOne({ email });
 
-        if (!user || user.password !== password) {
+        if (!user) {
+            return res.status(401).send("Invalid email or password.");
+        }
+
+        const isMatch = await user.comparePassword(password);
+
+        if (!isMatch) {
             return res.status(401).send("Invalid email or password.");
         }
 
