@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const { engine } = require('express-handlebars');
@@ -14,8 +16,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // --- CONFIGURATION ---
-// In a real production app, use process.env.SESSION_SECRET
-const SESSION_SECRET = "my_secret_key_ccapdev_mco3"; 
+const SESSION_SECRET = process.env.SESSION_SECRET;
 const MONGO_URI = "mongodb://localhost:27017/flightDB";
 
 // Helper function for safe number parsing
@@ -34,25 +35,27 @@ mongoose.connect(MONGO_URI)
 
 async function ensureDemoAdminExists() {
     const adminEmail = "admin@lasalle.ph";
-    const user = await User.findOne({ email: adminEmail });
+    const adminPassword = "admin";
+
+    let user = await User.findOne({ email: adminEmail });
     
     if (!user) {
         console.log("Creating demo admin account...");
-        const hashedPassword = await bcrypt.hash("admin", 10);
-        
-        const newAdmin = new User({
+        // CREATE NEW ADMIN
+        user = new User({
             fullName: "Admin Account",
             email: adminEmail,
             passportNumber: "ADM000000",
-            password: hashedPassword,
+            password: adminPassword,
             role: "admin"
         });
-        
-        await newAdmin.save();
-        console.log("Demo admin created (admin@lasalle.ph / admin).");
     } else {
-        console.log("Demo admin already exists.");
+        console.log("Resetting demo admin password...");
+        user.password = adminPassword; 
     }
+    
+    await user.save();
+    console.log("Demo admin ready (admin@lasalle.ph / admin).");
 }
 
 // --- 2. MIDDLEWARE ---
@@ -131,18 +134,16 @@ app.get('/register', (req, res) => {
 app.post('/register', async (req, res) => {
     try {
         const { fullName, email, passportNumber, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
         
         const newUser = new User({ 
             fullName, 
             email, 
             passportNumber, 
-            password: hashedPassword,
+            password: password,
             role: 'user' 
         });
         await newUser.save();
 
-        // Auto-login: Set session immediately
         req.session.userId = newUser._id;
         req.session.userRole = newUser.role;
         
