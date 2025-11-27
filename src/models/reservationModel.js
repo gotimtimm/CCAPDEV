@@ -1,6 +1,16 @@
 // src/models/reservationModel.js
 const mongoose = require('mongoose');
 
+// Helper to generate a random 6-character PNR
+const generatePNR = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 const reservationSchema = new mongoose.Schema({
   // Passenger Details
   fullName: { type: String, required: true },
@@ -21,8 +31,8 @@ const reservationSchema = new mongoose.Schema({
   },
   
   selectedSeat: { type: String, required: true },
-  mealOption: { type: Number, required: true, default: 0 },
-  extraBaggage: { type: Number, required: true, default: 2 },
+  mealOption: { type: Number, required: true, default: 0 }, // Stores cost in PHP
+  extraBaggage: { type: Number, required: true, default: 2 }, // Stores weight in KG
   totalPrice: { type: Number, required: true, min: 0 },
   reservedDate: { type: String, required: true },
   
@@ -31,12 +41,14 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     enum: ['Booked', 'Cancelled'],
     default: 'Booked'
-  },
-  
-  pnr: { 
+  }
+});
+
+// 
+pnr: { 
     type: String, 
     unique: true, 
-    default: generatePNR
+    default: generatePNR // Auto-generates on creation
   },
   isCheckedIn: { type: Boolean, default: false },
   boardingPassNumber: { type: String }
