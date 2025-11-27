@@ -1,18 +1,46 @@
 <div class="container mt-4">
   <h3>My Profile</h3>
   <form action="/profile/update" method="POST">
+    
     <div class="mb-3">
         <label>Full Name</label>
-        <input type="text" class="form-control" name="fullName" value="{{user.fullName}}" required>
+        <input type="text" class="form-control" id="fullName" name="fullName" value="{{user.fullName}}" required>
     </div>
+    
     <div class="mb-3">
         <label>Email</label>
-        <input type="email" class="form-control" name="email" value="{{user.email}}" required>
+        <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
     </div>
+    
     <div class="mb-3">
         <label>Passport Number</label>
-        <input type="text" class="form-control" name="passportNumber" value="{{user.passportNumber}}" required>
+        <input type="text" class="form-control" id="passportNumber" name="passportNumber" value="{{user.passportNumber}}" required>
     </div>
+    
     <button type="submit" class="btn btn-primary">Update Profile</button>
   </form>
 </div>
+
+<script>
+  document.querySelector('form').addEventListener('submit', function(e) {
+    
+    // Select inputs by their ID
+    const name = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const passport = document.getElementById('passportNumber').value;
+
+    // Run validation checks from validation.js
+    if (!validateName(name)) {
+      e.preventDefault();
+      alert("Name must contain only letters (min 2 chars).");
+    } 
+    else if (!validateEmail(email)) {
+      e.preventDefault();
+      alert("Please enter a valid email address.");
+    } 
+    else if (!validatePassport(passport)) {
+      e.preventDefault();
+      alert("Passport number must be at least 6 alphanumeric characters.");
+    }
+  });
+</script>
