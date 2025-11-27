@@ -34,6 +34,15 @@ const reservationSchema = new mongoose.Schema({
   }
 });
 
+pnr: { 
+    type: String, 
+    unique: true, 
+    default: generatePNR // Auto-generates on creation
+  },
+  isCheckedIn: { type: Boolean, default: false },
+  boardingPassNumber: { type: String }
+});
+
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
 module.exports = Reservation;
