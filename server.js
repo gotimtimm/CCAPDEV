@@ -15,6 +15,9 @@ const Flight = require('./src/models/flightModel');
 const Reservation = require('./src/models/reservationModel');
 const User = require('./src/models/userModel');
 
+// Import the API routes
+const apiRoutes = require('./src/routes/apiRoutes');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -65,6 +68,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
+// Register the API Routes
+app.use('/api', apiRoutes);
+
 // Session Setup
 app.use(session({
     secret: SESSION_SECRET,
@@ -92,6 +98,11 @@ app.use(async (req, res, next) => {
         res.locals.currentUser = null;
     }
     next();
+});
+
+// Route to render the Check-in Page
+app.get('/checkin', (req, res) => {
+    res.render('checkin', { pageTitle: "Online Check-in" });
 });
 
 // Prevents guests from accessing protected routes
