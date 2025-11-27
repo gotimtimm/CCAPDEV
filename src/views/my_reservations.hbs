@@ -16,28 +16,61 @@
     <div id="bookingsList" class="list-group shadow-sm">
       {{#if reservations}}
         {{#each reservations}}
-          <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-start {{#if (eq this.status 'Cancelled')}}list-group-item-danger disabled{{/if}}" 
-             data-id="{{this._id}}" 
-             data-bs-toggle="modal" 
-             data-bs-target="#bookingModal"
-             data-full-name="{{this.fullName}}"
-             data-email="{{this.email}}"
-             data-seat="{{this.selectedSeat}}"
-             data-meal="{{this.mealOption}}"
-             data-baggage="{{this.extraBaggage}}"
-             data-date="{{this.reservedDate}}"
-             data-price="{{this.totalPrice}}"
-             data-flight-id="{{this.flight._id}}"
-             data-base-price="{{this.flight.basePrice}}"
-             data-status="{{this.status}}"
-             data-flight-route="{{this.flight.origin}} &rarr; {{this.flight.destination}}">
-            <div>
-              <div class="fw-bold">{{this.flight.airlineName}} {{this.flight.flightNumber}}</div>
-              <div>{{this.flight.origin}} &rarr; {{this.flight.destination}} • {{this.fullName}}</div>
+          <div class="list-group-item list-group-item-action flex-column align-items-start {{#if (eq this.status 'Cancelled')}}list-group-item-danger{{/if}}">
+            
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">
+                 {{this.flight.airlineName}} {{this.flight.flightNumber}}
+                 <span class="text-muted fs-6">({{this.flight.origin}} &rarr; {{this.flight.destination}})</span>
+              </h5>
               <small class="text-muted">Date: {{this.reservedDate}}</small>
             </div>
-            <div>₱{{this.totalPrice}}</div>
-          </a>
+
+            <div class="mt-2">
+                <p class="mb-1">
+                    <strong>Passenger:</strong> {{this.fullName}} | 
+                    <strong>Seat:</strong> {{this.selectedSeat}} | 
+                    <strong>Price:</strong> ₱{{this.totalPrice}}
+                </p>
+
+                <div class="mt-2 mb-2">
+                    {{#if (eq this.status 'Cancelled')}}
+                        <span class="badge bg-danger">Cancelled</span>
+                    {{else}}
+                        {{#if this.isCheckedIn}}
+                            <span class="badge bg-success">✅ Checked In</span>
+                            <span class="badge bg-secondary">BP: {{this.boardingPassNumber}}</span>
+                        {{else}}
+                            <span class="badge bg-warning text-dark">Booked</span>
+                            <span class="badge bg-info text-dark">Ref: {{this.pnr}}</span> <a href="/checkin" class="btn btn-sm btn-primary ms-2" style="padding: 2px 10px; font-size: 12px;">
+                                Online Check-in &rarr;
+                            </a>
+                        {{/if}}
+                    {{/if}}
+                </div>
+                </div>
+
+            {{#unless (eq this.status 'Cancelled')}}
+            <button class="btn btn-sm btn-outline-secondary mt-2"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#bookingModal"
+                 data-id="{{this._id}}" 
+                 data-full-name="{{this.fullName}}"
+                 data-email="{{this.email}}"
+                 data-seat="{{this.selectedSeat}}"
+                 data-meal="{{this.mealOption}}"
+                 data-baggage="{{this.extraBaggage}}"
+                 data-date="{{this.reservedDate}}"
+                 data-price="{{this.totalPrice}}"
+                 data-flight-id="{{this.flight._id}}"
+                 data-base-price="{{this.flight.basePrice}}"
+                 data-status="{{this.status}}"
+                 data-flight-route="{{this.flight.origin}} &rarr; {{this.flight.destination}}">
+                 Manage Booking (Edit/Cancel)
+            </button>
+            {{/unless}}
+
+          </div>
         {{/each}}
       {{else}}
         <div class="list-group-item">No reservations found.</div>
@@ -51,7 +84,6 @@
         <div class="modal-header">
           <h5 class="modal-title">Manage Reservation: <span id="modalBookingId"></span></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
- 
         </div>
         <div class="modal-body">
           
