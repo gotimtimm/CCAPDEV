@@ -1,0 +1,38 @@
+2025-11-25 22:03:40 [INFO]: ::1 - - [25/Nov/2025:14:03:40 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:03:40 [INFO]: ::1 - - [25/Nov/2025:14:03:40 +0000] "GET /images/elnido.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:03:40 [INFO]: ::1 - - [25/Nov/2025:14:03:40 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:03:42 [INFO]: ::1 - - [25/Nov/2025:14:03:42 +0000] "GET /login HTTP/1.1" 200 2051 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:03:48 [INFO]: User logged in: admin@lasalle.ph
+2025-11-25 22:03:48 [INFO]: ::1 - - [25/Nov/2025:14:03:48 +0000] "POST /login HTTP/1.1" 302 43 "http://localhost:3000/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:03:48 [INFO]: ::1 - - [25/Nov/2025:14:03:48 +0000] "GET /admin/flights HTTP/1.1" 304 - "http://localhost:3000/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:04:25 [INFO]: ::1 - - [25/Nov/2025:14:04:25 +0000] "GET / HTTP/1.1" 200 6704 "http://localhost:3000/admin/flights" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:04:25 [INFO]: ::1 - - [25/Nov/2025:14:04:25 +0000] "GET /images/elnido.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:04:26 [INFO]: ::1 - - [25/Nov/2025:14:04:26 +0000] "GET /my-reservations HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:04:27 [INFO]: ::1 - - [25/Nov/2025:14:04:27 +0000] "GET / HTTP/1.1" 304 - "http://localhost:3000/my-reservations" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:04:27 [INFO]: ::1 - - [25/Nov/2025:14:04:27 +0000] "GET /images/elnido.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:06:36 [INFO]: ::1 - - [25/Nov/2025:14:06:36 +0000] "GET / HTTP/1.1" 200 6050 "http://localhost:3000/my-reservations" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:06:36 [INFO]: ::1 - - [25/Nov/2025:14:06:36 +0000] "GET /images/elnido.jpg HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0"
+2025-11-25 22:16:12 [INFO]: New user registered: test_jest@dlsu.edu.ph
+2025-11-25 22:16:12 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:12 +0000] "POST /register HTTP/1.1" 302 30 "-" "-"
+2025-11-25 22:16:12 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:12 +0000] "POST /login HTTP/1.1" 200 2051 "-" "-"
+2025-11-25 22:16:13 [INFO]: User logged in: test_jest@dlsu.edu.ph
+2025-11-25 22:16:13 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:13 +0000] "POST /login HTTP/1.1" 302 30 "-" "-"
+2025-11-25 22:16:13 [INFO]: User logged in: admin@lasalle.ph
+2025-11-25 22:16:13 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:13 +0000] "POST /login HTTP/1.1" 302 36 "-" "-"
+2025-11-25 22:16:13 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:13 +0000] "POST /admin/flights/create HTTP/1.1" 302 36 "-" "-"
+2025-11-25 22:16:13 [INFO]: Reservation created by test_jest@dlsu.edu.ph for flight 6925ba2da54c89cb436f2053
+2025-11-25 22:16:13 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:13 +0000] "POST /reservation-form/create HTTP/1.1" 302 38 "-" "-"
+2025-11-25 22:16:13 [INFO]: Reservation cancelled: 6925ba2da54c89cb436f2058
+2025-11-25 22:16:13 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:16:13 +0000] "POST /my-reservations/cancel/6925ba2da54c89cb436f2058 HTTP/1.1" 302 38 "-" "-"
+2025-11-25 22:20:02 [INFO]: New user registered: test_jest@dlsu.edu.ph
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /register HTTP/1.1" 302 30 "-" "-"
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /login HTTP/1.1" 200 2140 "-" "-"
+2025-11-25 22:20:02 [INFO]: User logged in: test_jest@dlsu.edu.ph
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /login HTTP/1.1" 302 30 "-" "-"
+2025-11-25 22:20:02 [INFO]: User logged in: admin@lasalle.ph
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /login HTTP/1.1" 302 36 "-" "-"
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /admin/flights/create HTTP/1.1" 302 36 "-" "-"
+2025-11-25 22:20:02 [INFO]: Reservation created by test_jest@dlsu.edu.ph for flight 6925bb1242075a955de01523
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /reservation-form/create HTTP/1.1" 302 38 "-" "-"
+2025-11-25 22:20:02 [INFO]: Reservation cancelled: 6925bb1242075a955de01528
+2025-11-25 22:20:02 [INFO]: ::ffff:127.0.0.1 - - [25/Nov/2025:14:20:02 +0000] "POST /my-reservations/cancel/6925bb1242075a955de01528 HTTP/1.1" 302 38 "-" "-"
