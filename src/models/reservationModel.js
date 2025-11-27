@@ -1,6 +1,16 @@
 // src/models/reservationModel.js
 const mongoose = require('mongoose');
 
+// Helper to generate a random 6-character PNR
+const generatePNR = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 const reservationSchema = new mongoose.Schema({
   // Passenger Details
   fullName: { type: String, required: true },
@@ -34,6 +44,7 @@ const reservationSchema = new mongoose.Schema({
   }
 });
 
+// 
 pnr: { 
     type: String, 
     unique: true, 
