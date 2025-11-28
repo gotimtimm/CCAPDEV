@@ -110,40 +110,72 @@
       filter: blur(10px);
       z-index: -1;
     }
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+      display: none;
+    }
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
   </style>
 </head>
 <body>
   <div id="bg"></div>
   <div class="content-container">
     <h1>Book Your Flight 🔖</h1>
-    <form id="reservationForm" method="POST" action="/reservations/book">
+    
+    <!-- Error Alert Box -->
+    <div id="errorAlert" class="alert alert-danger" style="display: none;"></div>
+    
+    <form id="reservationForm" method="POST" action="/secure-reservations">
       <input type="hidden" id="flightId" name="flightId" value="{{ flightId }}">
       <input type="hidden" id="selectedSeat" name="selectedSeat" value="">
       <input type="hidden" id="totalCost" name="totalCost" value="">
 
-      <label>Full Name</label>
-      <input type="text" id="name" name="passengerName" placeholder="Enter full name" required>
+      <div class="mb-3">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="passengerName" placeholder="Enter full name" required 
+               pattern="[A-Za-z\s]{2,}" title="Name must contain only letters and spaces (min 2 characters)">
+        <div class="error-message" id="nameError">Name must contain only letters and spaces (minimum 2 characters)</div>
+      </div>
 
-      <label>Email</label>
-      <input type="email" id="email" name="passengerEmail" placeholder="Enter email" required>
+      <div class="mb-3">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="passengerEmail" placeholder="Enter email" required>
+        <div class="error-message" id="emailError">Please enter a valid email address</div>
+      </div>
 
-      <label>Passport Number</label>
-      <input type="text" id="passport" name="passengerPassport" placeholder="Enter passport number" required>
+      <div class="mb-3">
+        <label for="passport">Passport Number</label>
+        <input type="text" id="passport" name="passengerPassport" placeholder="Enter passport number" required
+               pattern="[A-Z0-9]{6,}" title="Passport must be 6+ uppercase letters/numbers" maxlength="20">
+        <div class="error-message" id="passportError">Passport must be 6+ uppercase letters and numbers only</div>
+      </div>
 
-      <label>Meal Option</label>
-      <select id="meal" name="mealOption">
-        <option value="0">Chips (PHP 0)</option>
-        <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
-        <option value="270">Sausage with Hashbrown (PHP 270)</option>
-        <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
-        <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
-      </select>
+      <div class="mb-3">
+        <label for="meal">Meal Option</label>
+        <select id="meal" name="mealOption">
+          <option value="0">Chips (PHP 0)</option>
+          <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
+          <option value="270">Sausage with Hashbrown (PHP 270)</option>
+          <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
+          <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
+        </select>
+      </div>
 
-      <label>Extra Baggage (PHP 500 per bag)</label>
-      <input type="number" id="baggage" name="extraBaggage" value="0" min="0">
+      <div class="mb-3">
+        <label for="baggage">Extra Baggage (PHP 500 per bag)</label>
+        <input type="number" id="baggage" name="extraBaggage" value="0" min="0" max="10">
+        <div class="error-message" id="baggageError">Maximum 10 bags allowed</div>
+      </div>
 
-      <label>Select Your Seat</label>
-      <div class="seat-map" id="seatMap"></div>
+      <div class="mb-3">
+        <label for="seatMap">Select Your Seat</label>
+        <div class="seat-map" id="seatMap"></div>
+        <div class="error-message" id="seatError">Please select a seat before confirming</div>
+      </div>
 
       <div class="summary-box">
         <h3>Reservation Summary</h3>
@@ -154,7 +186,8 @@
       <a href="/" class="back-button">⬅ Back to Flight Search</a>
     </form>
   </div>
-   <script>
+  
+  <script>
     const images = [
       "/images/elnido.jpg",
       "/images/baguio.jpg",
@@ -167,6 +200,8 @@
     document.body.style.backgroundSize = "cover";
     document.getElementById("bg").style.background = `url('${randomImage}') center/cover no-repeat fixed`;
   </script>
+  
+      // ===== SYSTEM HARDENING: Client-side Validation =====
   <script>
     $(document).ready(function(){
       let baseFare = 5000;
@@ -189,6 +224,7 @@
         $(".seat.selected").removeClass("selected");
         $(this).addClass("selected");
         selectedSeat = $(this).data("seat");
+        $("#seatError").hide();
         updateSummary();
       });
     
@@ -207,7 +243,89 @@
         $("#selectedSeat").val(selectedSeat || "");
         $("#totalCost").val(total);
       }
+
       $("#meal, #baggage").on("change keyup", updateSummary);
+      
+      $("#name").on("input", function() {
+        $(this).val($(this).val().replace(/[^A-Za-z\s]/g, ''));
+        validateName();
+      });
+      
+      $("#passport").on("input", function() {
+        $(this).val($(this).val().toUpperCase().replace(/[^A-Z0-9]/g, ''));
+        validatePassport();
+      });
+      
+      $("#email").on("blur", validateEmail);
+      $("#baggage").on("change", validateBaggage);
+      
+      function validateName() {
+        const name = $("#name").val();
+        const isValid = /^[A-Za-z\s]{2,}$/.test(name);
+        toggleError("nameError", !isValid);
+        return isValid;
+      }
+      
+      function validateEmail() {
+        const email = $("#email").val();
+        const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        toggleError("emailError", !isValid);
+        return isValid;
+      }
+      
+      function validatePassport() {
+        const passport = $("#passport").val();
+        const isValid = /^[A-Z0-9]{6,}$/.test(passport);
+        toggleError("passportError", !isValid);
+        return isValid;
+      }
+      
+      function validateBaggage() {
+        const baggage = parseInt($("#baggage").val());
+        const isValid = baggage >= 0 && baggage <= 10;
+        toggleError("baggageError", !isValid);
+        return isValid;
+      }
+      
+      function validateSeat() {
+        const isValid = selectedSeat !== null && /^[A-D][1-9][0-5]?$/.test(selectedSeat);
+        toggleError("seatError", !isValid);
+        return isValid;
+      }
+      
+      function toggleError(errorId, show) {
+        if (show) {
+          $("#" + errorId).show();
+        } else {
+          $("#" + errorId).hide();
+        }
+      }
+      
+      $("#reservationForm").submit(function(e){
+        e.preventDefault();
+        
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isPassportValid = validatePassport();
+        const isBaggageValid = validateBaggage();
+        const isSeatValid = validateSeat();
+        
+        if (isNameValid && isEmailValid && isPassportValid && isBaggageValid && isSeatValid) {
+          $("#errorAlert").hide();
+          this.submit();
+        } else {
+          $("#errorAlert").text("Please fix the errors above before submitting.").show();
+          $('html, body').animate({
+            scrollTop: $("#errorAlert").offset().top - 20
+          }, 500);
+        }
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error');
+      if (error) {
+        $("#errorAlert").text(decodeURIComponent(error)).show();
+      }
     });
   </script>
 </body>
