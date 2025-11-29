@@ -1,0 +1,28 @@
+<div class="container mt-5" style="max-width: 600px;">
+  <h3>Edit User Profile</h3>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form action="/admin/users/update/{{userToEdit._id}}" method="POST">
+        
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" name="fullName" value="{{userToEdit.fullName}}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" name="email" value="{{userToEdit.email}}" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Passport Number (Read-only)</label>
+          <input type="text" class="form-control" value="{{userToEdit.passportNumber}}" readonly disabled>
+          <small class="text-muted">Passport numbers cannot be changed for security.</small>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="/admin/users" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>

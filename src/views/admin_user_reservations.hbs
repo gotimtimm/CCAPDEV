@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <title>Admin - Manage Reservations</title>
+
+  <style>
+    .seat-map-container {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 5px; margin: 15px 0; background: #f8f9fa; padding: 15px;
+      border-radius: 20px; max-height: 400px; overflow-y: auto; border: 2px solid #ddd;
+    }
+    .seat-row { display: flex; gap: 5px; align-items: center; }
+    .seat {
+      width: 40px; height: 35px; background: #e0e0e0;
+      text-align: center; line-height: 35px; border-radius: 6px;
+      cursor: pointer; font-size: 11px; user-select: none; border-bottom: 3px solid #ccc;
+    }
+    .seat.selected { background: #28a745; color: white; font-weight: bold; border-color: #1e7e34; }
+    .seat.occupied { background: #dc3545; color: white; cursor: not-allowed; border-color: #a71d2a; }
+    .seat.current { background: #007bff; color: white; border: 2px solid #0056b3; } 
+    
+    .aisle-spacer { width: 25px; }
+    .row-num { width: 20px; font-size: 10px; color: #888; text-align: center;}
+  </style>
+</head>
+
+<body class="bg-light">
+  
+  <div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Reservations for: <span class="text-primary">{{targetUser.fullName}}</span></h3>
+        <a href="/admin/users" class="btn btn-secondary">Back to Users</a>
+    </div>
+
+    <div class="list-group shadow-sm">
+      {{#if reservations}}
+        {{#each reservations}}
+          <div class="list-group-item list-group-item-action flex-column align-items-start {{#if (eq this.status 'Cancelled')}}list-group-item-danger{{/if}}">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">
+                 {{this.flight.airlineName}} {{this.flight.flightNumber}}
+                 <small class="text-muted">({{this.flight.origin}} &rarr; {{this.flight.destination}})</small>
+              </h5>
+              <div>
+                  {{#if (eq this.status 'Cancelled')}}
+                    <span class="badge bg-danger">Cancelled</span>
+                  {{else}}
+                    <span class="badge bg-success">{{this.status}}</span>
+                  {{/if}}
+              </div>
+            </div>
+            
+            <p class="mb-1">
+                Seat: <strong>{{this.selectedSeat}}</strong> | 
+                Price: ₱{{this.totalPrice}} | 
+                Meal: {{this.mealOption}} | 
+                Baggage: {{this.extraBaggage}}kg
+            </p>
+
+            {{#unless (eq this.status 'Cancelled')}}
+            <button class="btn btn-sm btn-warning mt-2"
+                 data-bs-toggle="modal" 
+                 data-bs-target="#adminBookingModal"
+                 data-id="{{this._id}}" 
+                 data-flight-id="{{this.flight._id}}"
+                 data-seat-capacity="{{this.flight.seatCapacity}}"
+                 data-seat="{{this.selectedSeat}}"
+                 data-meal="{{this.mealOption}}"
+                 data-baggage="{{this.extraBaggage}}">
+                 Edit / Cancel
+            </button>
+            {{/unless}}
+          </div>
+        {{/each}}
+      {{else}}
+        <div class="list-group-item">No reservations found for this user.</div>
+      {{/if}}
+    </div>
+  </div>
+
+  <div class="modal fade" id="adminBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg"> <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title">Admin Edit Reservation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          
+          <form id="adminEditForm" method="POST">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Seat Selection</label>
+                
+                <div class="d-flex justify-content-center gap-3 mb-2">
+                    <span class="badge bg-secondary">Occupied</span>
+                    <span class="badge bg-primary">Current</span>
+                    <span class="badge bg-success">New Selection</span>
+                </div>
+
+                <div id="modalSeatMapContainer" class="seat-map-container">
+                    <div class="text-muted">Loading seat map...</div>
+                </div>
+                
+                <div class="text-center">
+                    Selected: <span id="displaySelectedSeat" class="fw-bold text-success">None</span>
+                </div>
+                <input type="hidden" id="editSeat" name="selectedSeat" required>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Meal Option</label>
+                    <select id="editMeal" name="mealOption" class="form-select">
+                        <option value="0">Chips (PHP 0)</option>
+                        <option value="150">Mixed Vegetables (PHP 150)</option>
+                        <option value="270">Sausage (PHP 270)</option>
+                        <option value="320">Chicken (PHP 320)</option>
+                        <option value="360">Dumplings (PHP 360)</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Extra Baggage (KG)</label>
+                    <select id="editBaggage" name="extraBaggage" class="form-select">
+                        <option value="2">2 kg (Free)</option>
+                        <option value="5">5 kg (₱500)</option>
+                        <option value="10">10 kg (₱1,000)</option>
+                        <option value="15">15 kg (₱1,500)</option>
+                        <option value="20">20 kg (₱2,000)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                Note: Total price will be auto-calculated upon save.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+          </form>
+
+          <hr>
+
+          <form id="adminCancelForm" method="POST">
+             <button type="submit" class="btn btn-danger w-100" id="cancelButton">Cancel Reservation</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      let currentBookingSeat = "";
+
+      $('#adminBookingModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+
+        const id = button.data('id');
+        const flightId = button.data('flight-id');
+        const seatCapacity = button.data('seat-capacity') || 180;
+        const seat = button.data('seat');
+        const meal = button.data('meal');
+        const baggage = button.data('baggage');
+
+        currentBookingSeat = seat;
+
+        $("#editSeat").val(seat);
+        $("#displaySelectedSeat").text(seat);
+        $("#editMeal").val(meal);
+        $("#editBaggage").val(baggage);
+        $("#adminEditForm").attr('action', '/admin/reservations/update/' + id);
+        $("#adminCancelForm").attr('action', '/admin/reservations/cancel/' + id);
+
+        fetchAndRenderSeatMap(flightId, seat, seatCapacity);
+      });
+
+      function fetchAndRenderSeatMap(flightId, mySeat, seatCapacity) {
+          $("#modalSeatMapContainer").html('<div class="spinner-border text-primary"></div> Loading...');
+          
+          $.get(`/api/seats/${flightId}`, function(response) {
+              if(response.success) {
+                  renderMap(response.occupiedSeats, mySeat, seatCapacity);
+              } else {
+                  $("#modalSeatMapContainer").text("Error loading map.");
+              }
+          }).fail(function() {
+               $("#modalSeatMapContainer").text("Error connecting to server.");
+          });
+      }
+
+      function renderMap(occupiedSeats, mySeat, seatCapacity) {
+          $("#modalSeatMapContainer").empty();
+          
+          const rows = Math.ceil(seatCapacity / 6);
+          const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+          for(let r = 1; r <= rows; r++){
+              let rowHtml = `<div class="seat-row">`;
+              rowHtml += `<div class="row-num">${r}</div>`;
+
+              cols.forEach((c, index) => {
+                  let seatNum = c + r; 
+                  let classes = "seat";
+                  
+                  if (seatNum === mySeat) {
+                      classes += " current"; 
+                  } else if (occupiedSeats.includes(seatNum)) {
+                      classes += " occupied"; 
+                  }
+
+                  if(index === 3) rowHtml += `<div class="aisle-spacer"></div>`;
+
+                  rowHtml += `<div class="${classes}" data-seat="${seatNum}">${r}${c}</div>`;
+              });
+              
+              rowHtml += `</div>`;
+              $("#modalSeatMapContainer").append(rowHtml);
+          }
+      }
+
+      $(document).on("click", "#modalSeatMapContainer .seat", function() {
+          if ($(this).hasClass("occupied")) return; 
+          
+          $("#modalSeatMapContainer .seat.selected").removeClass("selected");
+          
+          if (!$(this).hasClass("current")) {
+              $(this).addClass("selected");
+          }
+
+          const newSeat = $(this).data("seat");
+          $("#editSeat").val(newSeat);
+          $("#displaySelectedSeat").text(newSeat);
+      });
+
+      $("#adminCancelForm").submit(function(e) {
+        if (!confirm("Are you sure you want to cancel this user's reservation? This cannot be undone.")) {
+            e.preventDefault();
+            return false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

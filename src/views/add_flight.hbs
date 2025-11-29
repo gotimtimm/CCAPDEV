@@ -6,7 +6,7 @@
       
       <div class="mb-3">
         <label for="flightNumber" class="form-label">Flight Number</label>
-        <input type="text" class="form-control" id="flightNumber" name="flightNumber" value="{{flight.flightNumber}}" required>
+        <input type="text" class="form-control" id="flightNumber" name="flightNumber" required>
       </div>
 
       <div class="mb-3">
@@ -14,8 +14,7 @@
         <input type="text" class="form-control" id="airlineName" name="airlineName" required>
       </div>
       
-  
-     <div class="row">
+      <div class="row">
         <div class="col-md-6 mb-3">
           <label for="origin" class="form-label">Origin</label>
           <select class="form-control" id="origin" name="origin" required>
@@ -35,10 +34,9 @@
         </div>
       </div>
 
- 
       <div class="mb-3">
         <label for="basePrice" class="form-label">Price (PHP)</label>
-        <input type="number" class="form-control" id="basePrice" name="basePrice" value="{{flight.basePrice}}" min="0" required>
+        <input type="number" class="form-control" id="basePrice" name="basePrice" min="0" required>
       </div>
 
       <div class="row">
@@ -57,24 +55,27 @@
           <label for="departureTime" class="form-label">Departure Time</label>
           <input type="time" class="form-control" id="departureTime" name="departureTime" required>
         </div>
-        <div 
-class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3">
           <label for="arrivalTime" class="form-label">Arrival Time</label>
           <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" required>
         </div>
       </div>
 
-      
-    <div class="row">
+      <div class="row">
         <div class="col-md-8 mb-3">
           <label for="aircraftType" class="form-label">Aircraft Type</label>
-          <input type="text" class="form-control" id="aircraftType" name="aircraftType" value="{{flight.aircraftType}}" required>
-       
-  </div>
-        <div 
-class="col-md-4 mb-3">
+          <select class="form-select" id="aircraftType" name="aircraftType" required>
+            <option value="" disabled selected>Select Aircraft</option>
+            <option value="Airbus A320">Airbus A320</option>
+            <option value="Boeing 737">Boeing 737</option>
+            <option value="Boeing 777">Boeing 777</option>
+            <option value="Airbus A350">Airbus A350</option>
+            <option value="Cessna 172">Cessna 172 (Small)</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
           <label for="seatCapacity" class="form-label">Seat Capacity</label>
-          <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" value="{{flight.seatCapacity}}" min="1" required>
+          <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" min="1" required readonly>
         </div>
       </div>
       
@@ -83,7 +84,28 @@ class="col-md-4 mb-3">
       <button type="submit" class="btn btn-primary">Add Flight</button>
       <a href="/admin/flights" class="btn btn-secondary">Cancel</a>
       
-  
    </form>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const aircraftMap = {
+        "Airbus A320": 180,
+        "Boeing 737": 160,
+        "Boeing 777": 396,
+        "Airbus A350": 350,
+        "Cessna 172": 4
+    };
+
+    const typeSelect = document.getElementById('aircraftType');
+    const capacityInput = document.getElementById('seatCapacity');
+
+    typeSelect.addEventListener('change', function() {
+        const selected = this.value;
+        if(aircraftMap[selected]) {
+            capacityInput.value = aircraftMap[selected];
+        }
+    });
+  });
+</script>

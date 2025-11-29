@@ -7,6 +7,25 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <title>My Reservations</title>
+
+  <style>
+    .seat-map-container {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 5px; margin: 15px 0; background: #f8f9fa; padding: 15px;
+      border-radius: 20px; max-height: 400px; overflow-y: auto; border: 2px solid #ddd;
+    }
+    .seat-row { display: flex; gap: 5px; align-items: center; }
+    .seat {
+      width: 40px; height: 35px; background: #e0e0e0;
+      text-align: center; line-height: 35px; border-radius: 6px;
+      cursor: pointer; font-size: 11px; user-select: none; border-bottom: 3px solid #ccc;
+    }
+    .seat.selected { background: #28a745; color: white; font-weight: bold; border-color: #1e7e34; }
+    .seat.occupied { background: #dc3545; color: white; cursor: not-allowed; border-color: #a71d2a; }
+    .seat.current { background: #007bff; color: white; border: 2px solid #0056b3; } 
+    .aisle-spacer { width: 25px; }
+    .row-num { width: 20px; font-size: 10px; color: #888; text-align: center;}
+  </style>
 </head>
 
 <body class="bg-light">
@@ -17,7 +36,6 @@
       {{#if reservations}}
         {{#each reservations}}
           <div class="list-group-item list-group-item-action flex-column align-items-start {{#if (eq this.status 'Cancelled')}}list-group-item-danger{{/if}}">
-            
             <div class="d-flex w-100 justify-content-between">
               <h5 class="mb-1">
                  {{this.flight.airlineName}} {{this.flight.flightNumber}}
@@ -28,7 +46,7 @@
 
             <div class="mt-2">
                 <p class="mb-1">
-                    <strong>Passenger:</strong> {{this.fullName}} | 
+                    <strong>Passenger:</strong> {{this.fullName}} |
                     <strong>Seat:</strong> {{this.selectedSeat}} | 
                     <strong>Price:</strong> ₱{{this.totalPrice}}
                 </p>
@@ -42,13 +60,12 @@
                             <span class="badge bg-secondary">BP: {{this.boardingPassNumber}}</span>
                         {{else}}
                             <span class="badge bg-warning text-dark">Booked</span>
-                            <span class="badge bg-info text-dark">Ref: {{this.pnr}}</span> <a href="/checkin" class="btn btn-sm btn-primary ms-2" style="padding: 2px 10px; font-size: 12px;">
-                                Online Check-in &rarr;
-                            </a>
+                            <span class="badge bg-info text-dark">Ref: {{this.pnr}}</span> 
+                            <a href="/checkin" class="btn btn-sm btn-primary ms-2" style="padding: 2px 10px; font-size: 12px;">Online Check-in &rarr;</a>
                         {{/if}}
                     {{/if}}
                 </div>
-                </div>
+            </div>
 
             {{#unless (eq this.status 'Cancelled')}}
             <button class="btn btn-sm btn-outline-secondary mt-2"
@@ -63,13 +80,13 @@
                  data-date="{{this.reservedDate}}"
                  data-price="{{this.totalPrice}}"
                  data-flight-id="{{this.flight._id}}"
+                 data-seat-capacity="{{this.flight.seatCapacity}}"
                  data-base-price="{{this.flight.basePrice}}"
                  data-status="{{this.status}}"
                  data-flight-route="{{this.flight.origin}} &rarr; {{this.flight.destination}}">
                  Manage Booking (Edit/Cancel)
             </button>
             {{/unless}}
-
           </div>
         {{/each}}
       {{else}}
@@ -82,11 +99,10 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Manage Reservation: <span id="modalBookingId"></span></h5>
+          <h5 class="modal-title">Manage Reservation</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          
           <div class="mb-3">
               <p><strong>Flight:</strong> <span id="modalFlightDetails"></span></p>
               <p><strong>Passenger:</strong> <span id="modalPassengerDetails"></span></p>
@@ -99,12 +115,21 @@
             
             <div id="editableContent">
                 <h6 class="fw-bold">Modify Options</h6>
-                <div class="row">
-                    <div class="col-md-12 mb-3">
-                        <label for="editSelectedSeat" class="form-label">Seat Selection</label>
-                        <input type="text" class="form-control" id="editSelectedSeat" name="selectedSeat" required>
-                        <small class="text-muted">Enter new seat (e.g., A1, B10).</small>
+                
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Select New Seat</label>
+                    <div id="modalSeatMapContainer" class="seat-map-container">
+                        <div class="text-muted">Loading seat map...</div>
                     </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Selected: <span id="displaySelectedSeat" class="fw-bold text-primary">None</span></small>
+                        <div class="d-flex gap-2">
+                             <span class="badge bg-secondary">Taken</span>
+                             <span class="badge bg-primary">Your Seat</span>
+                             <span class="badge bg-success">New Selection</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="editSelectedSeat" name="selectedSeat" required>
                 </div>
 
                 <div class="row">
@@ -114,7 +139,7 @@
                             <option value="0">Chips (PHP 0)</option>
                             <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
                             <option value="270">Sausage with Hashbrown (PHP 270)</option>
-                            <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
+                            <option value="320">Hainanese Soy Chicken with Brown Rice (PHP 320)</option>
                             <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
                         </select>
                     </div>
@@ -141,12 +166,8 @@
 
           <hr>
           <form id="cancelReservationForm" method="POST">
-              <button type="submit" class="btn btn-danger w-100 mt-3" id="cancelButton">Cancel Reservation</button>
+             <button type="submit" class="btn btn-danger w-100 mt-3" id="cancelButton">Cancel Reservation</button>
           </form>
-          
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -154,73 +175,115 @@
   
   <script>
     $(document).ready(function() {
-      // Define baggage tiers for pricing calculation
       const baggageTiers = [
-        { weight: 2, cost: 0 },
-        { weight: 5, cost: 500 },
-        { weight: 10, cost: 1000 },
-        { weight: 15, cost: 1500 },
-        { weight: 20, cost: 2000 }
+        { weight: 2, cost: 0 }, { weight: 5, cost: 500 }, { weight: 10, cost: 1000 },
+        { weight: 15, cost: 1500 }, { weight: 20, cost: 2000 }
       ];
 
-      // --- Dynamic Price Update Logic for Edit Modal ---
+      let currentBookingSeat = "";
+
       function updateEditSummary() {
         let baseFare = parseInt($("#editFlightBasePrice").val()) || 0;
         let mealCost = parseInt($("#editMeal").val()) || 0;
-        
         let selectedWeightKg = parseInt($("#editBaggage").val());
         let baggageCost = baggageTiers.find(tier => tier.weight === selectedWeightKg)?.cost || 0;
-        
         let total = baseFare + mealCost + baggageCost;
-
         $("#editTotalSummary").text(`₱${total}`);
         $("#editTotalPriceHidden").val(total);
       }
 
-      $("#editMeal, #editBaggage, #editSelectedSeat").on("change keyup", updateEditSummary);
+      $("#editMeal, #editBaggage").on("change", updateEditSummary);
 
-      // --- Modal Logic to Load Data ---
       $('#bookingModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         
-        // Extract data
         const id = button.data('id');
-        const fullName = button.data('full-name');
-        const email = button.data('email');
-        const basePrice = button.data('base-price');
-        const flightRoute = button.data('flight-route');
-
+        const flightId = button.data('flight-id');
+        const seatCapacity = button.data('seat-capacity') || 180;
         const currentSeat = button.data('seat');
-        const currentMeal = button.data('meal');
-        const currentBaggageKg = button.data('baggage'); 
-        const currentDate = button.data('date');
+        currentBookingSeat = currentSeat;
 
-        // Populate modal content
         $("#modalBookingId").text(id);
-        $("#modalFlightDetails").html(flightRoute);
-        $("#modalPassengerDetails").text(fullName + ' (' + email + ')');
-        $("#modalReservedDate").text(currentDate); 
+        $("#modalFlightDetails").html(button.data('flight-route'));
+        $("#modalPassengerDetails").text(button.data('full-name'));
+        $("#modalReservedDate").text(button.data('date'));
+        $("#editFlightBasePrice").val(button.data('base-price'));
         
-        // Set form action URLs
+        $("#editSelectedSeat").val(currentSeat);
+        $("#displaySelectedSeat").text(currentSeat);
+        $("#editMeal").val(button.data('meal'));
+        $("#editBaggage").val(button.data('baggage'));
+        
         $("#editReservationForm").attr('action', '/my-reservations/update/' + id);
         $("#cancelReservationForm").attr('action', '/my-reservations/cancel/' + id);
 
-        // Populate form fields
-        $("#editSelectedSeat").val(currentSeat);
-        $("#editMeal").val(currentMeal).trigger('change');
-        $("#editBaggage").val(currentBaggageKg).trigger('change'); 
-        
-        $("#editFlightBasePrice").val(basePrice);
         updateEditSummary();
+        fetchAndRenderSeatMap(flightId, currentSeat, seatCapacity);
       });
-      
-      // FIX: Confirmation dialog and submission for cancellation
+
+      function fetchAndRenderSeatMap(flightId, mySeat, seatCapacity) {
+          $("#modalSeatMapContainer").html('<div class="spinner-border text-primary"></div> Loading...');
+          
+          $.get(`/api/seats/${flightId}`, function(response) {
+              if(response.success) {
+                  renderMap(response.occupiedSeats, mySeat, seatCapacity);
+              } else {
+                  $("#modalSeatMapContainer").text("Error loading map.");
+              }
+          }).fail(function() {
+               $("#modalSeatMapContainer").text("Error connecting to server.");
+          });
+      }
+
+      function renderMap(occupiedSeats, mySeat, seatCapacity) {
+          $("#modalSeatMapContainer").empty();
+
+          const rows = Math.ceil(seatCapacity / 6);
+          const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+          for(let r = 1; r <= rows; r++){
+              let rowHtml = `<div class="seat-row">`;
+              rowHtml += `<div class="row-num">${r}</div>`;
+
+              cols.forEach((c, index) => {
+                  let seatNum = c + r; 
+                  let classes = "seat";
+                  
+                  if (seatNum === mySeat) {
+                      classes += " current"; 
+                  } else if (occupiedSeats.includes(seatNum)) {
+                      classes += " occupied"; 
+                  }
+
+                  if(index === 3) rowHtml += `<div class="aisle-spacer"></div>`;
+
+                  rowHtml += `<div class="${classes}" data-seat="${seatNum}">${r}${c}</div>`;
+              });
+              
+              rowHtml += `</div>`;
+              $("#modalSeatMapContainer").append(rowHtml);
+          }
+      }
+
+      $(document).on("click", "#modalSeatMapContainer .seat", function() {
+          if ($(this).hasClass("occupied")) return; 
+          
+          $("#modalSeatMapContainer .seat.selected").removeClass("selected");
+          
+          if (!$(this).hasClass("current")) {
+              $(this).addClass("selected");
+          }
+
+          const newSeat = $(this).data("seat");
+          $("#editSelectedSeat").val(newSeat);
+          $("#displaySelectedSeat").text(newSeat);
+      });
+
       $("#cancelReservationForm").submit(function(e) {
-        if (!confirm("Are you sure you want to cancel this reservation? This action cannot be undone.")) {
+        if (!confirm("Are you sure you want to cancel?")) {
             e.preventDefault();
             return false;
         }
-        // If confirmed, the form submits the POST request to /my-reservations/cancel/:id
       });
     });
   </script>

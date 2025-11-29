@@ -9,26 +9,39 @@
   <div class="container mt-4">
     <h3>User Management</h3>
     
-    <table class="table">
-      <thead>
-        <tr>
-          <th>User ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{#each users}}
-        <tr>
-          <td>{{this._id}}</td>
-          <td>{{this.name}}</td>
-          <td>{{this.email}}</td>
-          <td><button class="btn btn-sm btn-warning">Edit</button></td>
-        </tr>
-        {{/each}}
-      </tbody>
-    </table>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <table class="table table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Passport</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each users}}
+            <tr>
+              <td>{{this.fullName}}</td>
+              <td>{{this.email}}</td>
+              <td>{{this.passportNumber}}</td>
+              <td><span class="badge {{#if (eq this.role 'admin')}}bg-danger{{else}}bg-primary{{/if}}">{{this.role}}</span></td>
+              <td>
+                <a href="/admin/users/edit/{{this._id}}" class="btn btn-sm btn-warning">Edit Profile</a>
+                <a href="/admin/users/{{this._id}}/reservations" class="btn btn-sm btn-info text-white">View Bookings</a>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="mt-3">
+        <a href="/admin/flights" class="btn btn-secondary">&larr; Back to Dashboard</a>
+    </div>
   </div>
 </body>
 </html>

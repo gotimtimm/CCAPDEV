@@ -29,16 +29,12 @@
 </div>
 
 <script>
-  // Wait for the form to be submitted
   document.querySelector('form').addEventListener('submit', function(e) {
     
-    // Get values from the inputs
     const name = document.getElementById('fullName').value;
     const email = document.getElementById('email').value;
     const passport = document.getElementById('passportNumber').value;
 
-    // Use the functions from validation.js
-    // If any validation fails, we stop the form (e.preventDefault) and show an alert
     if (!validateName(name)) {
       e.preventDefault(); 
       alert("Name must contain only letters (min 2 chars).");

@@ -237,6 +237,7 @@ app.get('/', async (req, res) => {
     if (origin) filter.origin = origin.toUpperCase();
     if (destination) filter.destination = destination.toUpperCase();
     if (departure_date) filter.departureDate = departure_date;
+    
     if (arrival_date) filter.arrivalDate = arrival_date;
 
     const flights = await Flight.find(filter).lean();
@@ -258,16 +259,22 @@ app.get('/reservation-form', ensureAuthenticated, async (req, res) => {
     try {
         const flightId = req.query.flightId;
         const departureDate = req.query.date;
+        const pax = parseInt(req.query.pax) || 1;
 
         if (!flightId || !departureDate) return res.redirect('/');
         
         const selectedFlight = await Flight.findById(flightId).lean();
         if (!selectedFlight) return res.status(404).send("Flight not found.");
 
+        const existingReservations = await Reservation.find({ flight: flightId }).select('selectedSeat');
+        const occupiedSeats = existingReservations.map(r => r.selectedSeat);
+
         res.render('reservation_form', { 
             pageTitle: "Book Flight", 
             flight: selectedFlight,
-            reservedDate: departureDate
+            reservedDate: departureDate,
+            pax: pax,
+            occupiedSeats: JSON.stringify(occupiedSeats)
         });
     } catch (err) {
          res.status(500).send("Error: " + err.message);
@@ -277,29 +284,53 @@ app.get('/reservation-form', ensureAuthenticated, async (req, res) => {
 // CREATE RESERVATION (Protected & Linked to User)
 app.post('/reservation-form/create', ensureAuthenticated, async (req, res) => { 
     try {
-        const { flightId, selectedSeat, mealOption, extraBaggage, totalPrice, reservedDate } = req.body;
+        const toArray = (val) => Array.isArray(val) ? val : [val];
+
+        const { flightId, reservedDate } = req.body;
+        const fullNames = toArray(req.body.fullName);
+        const passports = toArray(req.body.passportNumber);
+        const meals = toArray(req.body.mealOption);
+        const baggages = toArray(req.body.extraBaggage);
+        const seats = toArray(req.body.selectedSeat);
+        
+        const flight = await Flight.findById(flightId);
         
         const user = await User.findById(req.session.userId).lean();
         if (!user) return res.redirect('/login');
 
-        const newReservation = new Reservation({
-            user: req.session.userId,
-            fullName: user.fullName, 
-            email: user.email,
-            passportNumber: user.passportNumber,
+        for (let i = 0; i < fullNames.length; i++) {
             
-            flight: flightId, 
-            selectedSeat,
-            mealOption: safeParseInt(mealOption),
-            extraBaggage: safeParseInt(extraBaggage, 2),
-            totalPrice: safeParseInt(totalPrice),
-            reservedDate
-        });
+            const conflict = await Reservation.findOne({ flight: flightId, selectedSeat: seats[i] });
+            if (conflict) {
+                return res.status(400).send(`Seat ${seats[i]} is already taken. Please try again.`);
+            }
 
-        await newReservation.save();
-        
-        logger.info(`Reservation created by ${user.email} for flight ${flightId}`);
+            let baggageCost = 0;
+            if(parseInt(baggages[i]) == 5) baggageCost = 500;
+            if(parseInt(baggages[i]) == 10) baggageCost = 1000;
+            if(parseInt(baggages[i]) == 15) baggageCost = 1500;
+            if(parseInt(baggages[i]) == 20) baggageCost = 2000;
+            
+            let total = flight.basePrice + parseInt(meals[i]) + baggageCost;
 
+            const newReservation = new Reservation({
+                user: req.session.userId,
+                fullName: fullNames[i], 
+                email: user.email,
+                passportNumber: passports[i],
+                
+                flight: flightId, 
+                selectedSeat: seats[i],
+                mealOption: safeParseInt(meals[i]),
+                extraBaggage: safeParseInt(baggages[i], 2),
+                totalPrice: total,
+                reservedDate
+            });
+
+            await newReservation.save();
+        }
+
+        logger.info(`Reservations created by ${user.email} for flight ${flightId}`);
         res.redirect('/my-reservations');
     } catch (err) {
         logger.error(`Create Reservation Error: ${err.message}`); 
@@ -383,7 +414,107 @@ app.post('/profile/update', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// [ADDED] Global Error Handler 
+// --- ADMIN USER MANAGEMENT ROUTES ---
+
+//GET: Show "Edit User" Form
+app.get('/admin/users/edit/:id', ensureAdmin, async (req, res) => {
+    try {
+        const userToEdit = await User.findById(req.params.id).lean();
+        if (!userToEdit) return res.status(404).send("User not found");
+        
+        res.render('admin_edit_user', { 
+            pageTitle: "Edit User",
+            userToEdit: userToEdit 
+        });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+//POST: Update User Details
+app.post('/admin/users/update/:id', ensureAdmin, async (req, res) => {
+    try {
+        const { fullName, email } = req.body;
+        await User.findByIdAndUpdate(req.params.id, { fullName, email }, { runValidators: true });
+        logger.info(`Admin updated user ${req.params.id}`);
+        res.redirect('/admin/users');
+    } catch (err) {
+        res.status(500).send("Error updating user: " + err.message);
+    }
+});
+
+//GET: View a specific User's Reservations
+app.get('/admin/users/:id/reservations', ensureAdmin, async (req, res) => {
+    try {
+        const targetUser = await User.findById(req.params.id).lean();
+        if (!targetUser) return res.status(404).send("User not found");
+
+        const reservations = await Reservation.find({ user: req.params.id })
+            .populate('flight')
+            .lean();
+
+        res.render('admin_user_reservations', {
+            pageTitle: `Reservations for ${targetUser.fullName}`,
+            targetUser: targetUser,
+            reservations: reservations
+        });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+//POST: Admin Update Reservation (Redirects back to User's List)
+app.post('/admin/reservations/update/:id', ensureAdmin, async (req, res) => {
+    try {
+        const reservationId = req.params.id;
+        const reservation = await Reservation.findById(reservationId);
+        
+        if (!reservation) return res.status(404).send("Reservation not found");
+
+        const { selectedSeat, mealOption, extraBaggage } = req.body;
+        const flight = await Flight.findById(reservation.flight);
+        
+        let baggageCost = 0;
+        const bagWeight = parseInt(extraBaggage);
+        if(bagWeight == 5) baggageCost = 500;
+        if(bagWeight == 10) baggageCost = 1000;
+        if(bagWeight == 15) baggageCost = 1500;
+        if(bagWeight == 20) baggageCost = 2000;
+        
+        const newTotal = flight.basePrice + parseInt(mealOption) + baggageCost;
+
+        await Reservation.findByIdAndUpdate(reservationId, {
+            selectedSeat,
+            mealOption: parseInt(mealOption),
+            extraBaggage: bagWeight,
+            totalPrice: newTotal
+        });
+
+        logger.info(`Admin updated reservation ${reservationId}`);
+        
+        res.redirect(`/admin/users/${reservation.user}/reservations`);
+    } catch (err) {
+        res.status(500).send("Error updating reservation: " + err.message);
+    }
+});
+
+app.post('/admin/reservations/cancel/:id', ensureAdmin, async (req, res) => {
+    try {
+        const reservationId = req.params.id;
+        const reservation = await Reservation.findById(reservationId);
+        if (!reservation) return res.status(404).send("Reservation not found");
+        
+        const userId = reservation.user;
+
+        await Reservation.findByIdAndDelete(reservationId);
+        logger.info(`Admin cancelled reservation ${reservationId}`);
+
+        res.redirect(`/admin/users/${userId}/reservations`);
+    } catch (err) {
+        res.status(500).send("Error cancelling reservation: " + err.message);
+    }
+});
+
 app.use((err, req, res, next) => {
     logger.error(`System Error: ${err.message} \nStack: ${err.stack}`);
     res.status(500).send("Something went wrong!");

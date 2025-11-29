@@ -114,6 +114,8 @@ describe('MCO3 Main Workflows', () => {
                 .post('/reservation-form/create')
                 .send({
                     flightId: flightId,
+                    fullName: 'Jest Passenger', 
+                    passportNumber: 'P12345678', 
                     selectedSeat: '1A',
                     mealOption: 0,
                     extraBaggage: 20,
@@ -129,6 +131,8 @@ describe('MCO3 Main Workflows', () => {
         });
 
         it('POST /my-reservations/cancel/:id - should cancel a reservation', async () => {
+            expect(reservationId).toBeDefined();
+
             const res = await userAgent
                 .post(`/my-reservations/cancel/${reservationId}`);
             

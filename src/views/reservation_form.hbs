@@ -13,195 +13,115 @@
       font-family: Arial, sans-serif;
       background: url("/images/elnido.jpg"); 
       background-size: cover;
-      margin: 0;
-      padding: 0px;
+      margin: 0; padding: 0px;
     }
-
     .content-container {
-      max-width: 1250px;
-      margin: 50px auto 0 auto;  
-      background: #ffffff;
-      padding: 50px;
-      border-radius: 50px;
+      max-width: 1250px; margin: 50px auto 0 auto;  
+      background: #ffffff; padding: 50px; border-radius: 50px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
-    .navbar .container-fluid {
-      padding: 0 40px;
-    }
-
-    h1 {
-      color: #007bff;
-      margin-bottom: 50px;
-      margin-top: -20px;
-    }
-
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-
+    h1 { color: #007bff; margin-bottom: 50px; margin-top: -20px; }
+    label { font-weight: bold; margin-top: 10px; display: block; }
     input, select {
-      width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-      margin-top: 10px;
-      font-size: 14px;
+      width: 100%; padding: 8px; border-radius: 8px;
+      border: 1px solid #ccc; margin-bottom: 10px; margin-top: 10px; font-size: 14px;
     }
-
+    /* Seat Map Styles */
     .seat-map {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-      margin: 15px 0 25px 0;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; margin: 25px 0; padding: 20px;
+      background: #f0f0f0; border-radius: 30px 30px 100px 100px;
+      border: 4px solid #ddd; width: fit-content; margin-left: auto; margin-right: auto;
     }
-
+    .seat-row { display: flex; gap: 5px; align-items: center; }
     .seat {
-      width: 60px;
-      height: 35px;
-      background: #e0e0e0;
-      text-align: center;
-      line-height: 35px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
+      width: 40px; height: 40px; background: #e0e0e0;
+      text-align: center; line-height: 40px; border-radius: 8px;
+      cursor: pointer; font-size: 12px; font-weight: bold; color: #555;
+      border-bottom: 4px solid #bbb;
     }
-
-    .seat.selected {
-      background: #28a745;
-      color: white;
-      font-weight: bold;
+    .seat.selected { background: #28a745; color: white; border-color: #1e7e34; }
+    .seat.occupied { background: #dc3545; color: white; cursor: not-allowed; border-color: #a71d2a; }
+    .aisle-number { width: 30px; text-align: center; font-size: 10px; color: #aaa; font-weight: bold; }
+    .aisle-spacer { width: 30px; }
+    .summary-box { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 15px; }
+    .btn-action {
+      padding: 10px; border: none; border-radius: 8px; font-size: 16px;
+      cursor: pointer; margin-top: 10px; color: white; width: 100%;
     }
-
-    .seat.occupied {
-      background: #dc3545;
-      color: white;
-      cursor: not-allowed;
-    }
-
-    .summary-box {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 15px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 50px;  
-      margin-bottom: 50px;
-    }
-
-    .back-button {
-      width: 100;
-      padding: 10px;
-      background: #ff0000;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
+    .btn-submit { background: #007bff; margin-top: 30px; margin-bottom: 20px; }
+    .btn-back { background: #ff0000; display: block; text-align: center; text-decoration: none; }
+    .btn-add { background: #28a745; margin-bottom: 5px; }
+    .btn-remove { background: #dc3545; }
     #bg {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      bottom: 0;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: 120%;
-      filter: blur(10px);
-      z-index: -1;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background-position: center; background-repeat: no-repeat;
+      background-size: 120%; filter: blur(10px); z-index: -1;
     }
-
-
+    .passenger-card {
+        background: #f9f9f9; border: 1px solid #ddd; border-radius: 10px;
+        padding: 20px; margin-bottom: 20px;
+    }
+    .passenger-card h5 {
+        color: #007bff; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;
+    }
   </style>
 </head>
 
 <body>
-
   <div id="bg"></div>
   <div class="content-container">
     <h1>Book Your Flight 🔖</h1>
     <div class="alert alert-info">
-      Booking Flight <strong>{{flight.flightNumber}}</strong> ({{flight.origin}} &rarr; {{flight.destination}}) on <strong>{{reservedDate}}</strong> for ₱{{flight.basePrice}}
+      Booking Flight <strong>{{flight.flightNumber}}</strong> ({{flight.origin}} &rarr; {{flight.destination}}) on <strong>{{reservedDate}}</strong> for ₱{{flight.basePrice}} per person.
     </div>
 
     <form id="reservationForm" action="/reservation-form/create" method="POST">
       <input type="hidden" id="flightId" name="flightId" value="{{flight._id}}"> 
       <input type="hidden" id="reservedDate" name="reservedDate" value="{{reservedDate}}">
 
-      <label>Full Name</label>
-      <input type="text" id="name" name="fullName" placeholder="Enter full name" required>
+      <div id="passengerContainer"></div>
 
-      <label>Email</label>
-      <input type="email" id="email" name="email" placeholder="Enter email" required>
+      <div class="row">
+        <div class="col-md-6">
+            <button type="button" class="btn-action btn-add" id="addPaxBtn">+ Add Another Passenger</button>
+        </div>
+        <div class="col-md-6">
+            <button type="button" class="btn-action btn-remove" id="removePaxBtn">- Remove Last Passenger</button>
+        </div>
+      </div>
 
-      <label>Passport Number</label>
-      <input type="text" id="passport" name="passportNumber" placeholder="Enter passport number" required>
+      <hr class="my-4">
 
-      <label>Meal Option</label>
-      <select id="meal" name="mealOption">
-        <option 
-        value="0">Chips (PHP 0)</option>
-        <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
-        <option value="270">Sausage with Hashbrown (PHP 270)</option>
-        <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
-        <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
-      </select>
+      <h4 class="text-center">Select Seats (<span id="seatsSelectedCount">0</span>/<span id="paxDisplay">1</span>)</h4>
+      <div class="d-flex justify-content-center mb-2">
+          <span class="badge bg-secondary me-2">Occupied</span>
+          <span class="badge bg-success me-2">Selected</span>
+          <span class="badge" style="background:#e0e0e0; color:#555">Available</span>
+      </div>
 
-      <label>Extra Baggage Weight (KG)</label>
-      <select id="baggage" name="extraBaggage" class="form-select">
-        <option value="2">2 kg (Free)</option>
-        <option value="5">5 kg (₱500)</option>
-        <option value="10">10 kg (₱1,000)</option>
-        <option value="15">15 kg (₱1,500)</option>
-        <option value="20">20 kg (₱2,000)</option>
-      </select>
-
-      <label>Select Your Seat</label>
-     
       <div class="seat-map" id="seatMap"></div>
 
       <div class="summary-box">
         <h3>Reservation Summary</h3>
-        <p id="summary">Base Fare: PHP {{flight.basePrice}}<br>Total: PHP {{flight.basePrice}}</p>
+        <div id="summaryContent"></div>
+        <hr>
+        <h4 id="grandTotal">Total: PHP 0</h4>
       </div>
 
-      <input type="hidden" id="selectedSeatHidden" name="selectedSeat">
       <input type="hidden" id="totalPriceHidden" name="totalPrice">
+      <div id="seatInputsContainer"></div>
 
-
-      <button type="submit">Confirm Reservation ✈️</button>
-
-      <a href="/" class="back-button">⬅ Back to Flight Search</a>
-
+      <button type="submit" class="btn-action btn-submit">Confirm Reservation ✈️</button>
+      <a href="/" class="btn-action btn-back">⬅ Back to Flight Search</a>
     </form>
   </div>
 
    <script>
-  
     const images = [
-      "/images/elnido.jpg",
-      "/images/baguio.jpg",
-      "/images/mayon.jpg",
-    
-      "/images/ilocos.jpg",
-      "/images/bohol.jpg"
+      "/images/elnido.jpg", "/images/baguio.jpg", "/images/mayon.jpg",
+      "/images/ilocos.jpg", "/images/bohol.jpg"
     ];
-
     const randomImage = images[Math.floor(Math.random() * images.length)];
     document.body.style.background = `url('${randomImage}') no-repeat center center fixed`;
     document.body.style.backgroundSize = "cover";
@@ -210,83 +130,175 @@
 
   <script>
     $(document).ready(function(){
-      // Set base fare from server-side data
-      let baseFare = parseInt("{{flight.basePrice}}" || 5000); 
-      let selectedSeat = null;
+      const baseFare = parseInt("{{flight.basePrice}}" || 5000); 
+      const seatCapacity = parseInt("{{flight.seatCapacity}}") || 180;
+      
+      let paxCount = parseInt("{{pax}}") || 1;
+      const occupiedSeats = {{#if occupiedSeats}}{{{occupiedSeats}}}{{else}}[]{{/if}};
+      
+      let selectedSeats = [];
 
-      // Define baggage tiers for pricing calculation
       const baggageTiers = [
-        { weight: 2, cost: 0 },
-        { weight: 5, cost: 500 },
-        { weight: 10, cost: 1000 },
-        { weight: 15, cost: 1500 },
+        { weight: 2, cost: 0 }, { weight: 5, cost: 500 },
+        { weight: 10, cost: 1000 }, { weight: 15, cost: 1500 },
         { weight: 20, cost: 2000 }
       ];
-      
-      for(let row = 1; row <= 4; row++){
-        for(let col = 1; col <= 15; col++){
-          let seatNum = String.fromCharCode(64 + row) + col; // A1, A2, ..., D15
-          $("#seatMap").append(`<div class="seat" data-seat="${seatNum}">${seatNum}</div>`);
-        
-        }
 
-        if (row == 2){
-          $("#seatMap").append("<div style='flex-basis: 100%; height: 50px;'></div>");
-        } else {
-          $("#seatMap").append("<div style='flex-basis: 100%; height: 5px;'></div>");
-        }
+      function createPassengerForm(index) {
+          return `
+          <div class="passenger-card" id="pax-card-${index}">
+              <h5>Passenger ${index} Details</h5>
+              <label>Full Name</label>
+              <input type="text" name="fullName" placeholder="Enter full name" required>
+              <label>Passport Number</label>
+              <input type="text" name="passportNumber" placeholder="Enter passport number" required>
+              <label>Meal Option</label>
+              <select name="mealOption" class="meal-select" data-index="${index}">
+                <option value="0">Chips (PHP 0)</option>
+                <option value="150">Mixed Vegetables with Mashed Potato (PHP 150)</option>
+                <option value="270">Sausage with Hashbrown (PHP 270)</option>
+                <option value="320">Hainanese Soy Chicken with Brown Rice(PHP 320)</option>
+                <option value="360">Chives Dumpling with Japanese Gyudon (PHP 360)</option>
+              </select>
+              <label>Extra Baggage</label>
+              <select name="extraBaggage" class="baggage-select" data-index="${index}">
+                <option value="2">2 kg (Free)</option>
+                <option value="5">5 kg (₱500)</option>
+                <option value="10">10 kg (₱1,000)</option>
+                <option value="15">15 kg (₱1,500)</option>
+                <option value="20">20 kg (₱2,000)</option>
+              </select>
+          </div>`;
       }
 
-     
+      function initForms() {
+          let html = '';
+          for (let i = 1; i <= paxCount; i++) {
+              html += createPassengerForm(i);
+          }
+          $('#passengerContainer').html(html);
+          updateUI();
+      }
+
+      $('#addPaxBtn').click(function() {
+          paxCount++;
+          $('#passengerContainer').append(createPassengerForm(paxCount));
+          updateUI();
+      });
+
+      $('#removePaxBtn').click(function() {
+          if (paxCount > 1) {
+              $(`#pax-card-${paxCount}`).remove();
+              if (selectedSeats.length >= paxCount) {
+                  const removedSeat = selectedSeats.pop();
+                  $(`.seat[data-seat="${removedSeat}"]`).removeClass('selected');
+              }
+              paxCount--;
+              updateUI();
+          } else {
+              alert("You must have at least one passenger.");
+          }
+      });
+
+      function generateSeatMap() {
+          $("#seatMap").empty();
+          
+          let headerHtml = `<div class="d-flex gap-2 mb-2"><div style="width:30px"></div>`;
+          ['A','B','C','','D','E','F'].forEach(l => {
+              if(l === '') headerHtml += `<div class="aisle-spacer"></div>`;
+              else headerHtml += `<div style="width:40px; text-align:center; font-weight:bold;">${l}</div>`;
+          });
+          headerHtml += `</div>`;
+          $("#seatMap").append(headerHtml);
+
+          const rows = Math.ceil(seatCapacity / 6); 
+          const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+          for(let r = 1; r <= rows; r++){
+              let rowHtml = `<div class="seat-row">`;
+              rowHtml += `<div class="aisle-number">${r}</div>`;
+
+              cols.forEach((c, index) => {
+                  let seatNum = c + r; 
+                  let isOccupied = occupiedSeats.includes(seatNum) ? 'occupied' : '';
+                  let isSelected = selectedSeats.includes(seatNum) ? 'selected' : '';
+                  
+                  if(index === 3) rowHtml += `<div class="aisle-spacer"></div>`;
+
+                  rowHtml += `<div class="seat ${isOccupied} ${isSelected}" data-seat="${seatNum}">${r}${c}</div>`;
+              });
+              
+              rowHtml += `</div>`;
+              $("#seatMap").append(rowHtml);
+          }
+      }
+
       $(document).on("click", ".seat", function(){
         if($(this).hasClass("occupied")) return;
-        $(".seat.selected").removeClass("selected");
-       
-        $(this).addClass("selected");
-        selectedSeat = $(this).data("seat");
+        const seatNum = $(this).data("seat");
+
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+            selectedSeats = selectedSeats.filter(s => s !== seatNum);
+        } else {
+            if (selectedSeats.length < paxCount) {
+                $(this).addClass("selected");
+                selectedSeats.push(seatNum);
+            } else {
+                alert(`You have added ${paxCount} passengers. Add another passenger to select more seats.`);
+            }
+        }
         updateSummary();
       });
 
-    
-      function updateSummary(){
-        let mealCost = parseInt($("#meal").val());
-        
-        // Get the selected baggage weight (in KG)
-        let selectedWeightKg = parseInt($("#baggage").val());
-        // Find the corresponding cost based on the weight tiers
-        let baggageCost = baggageTiers.find(tier => tier.weight === selectedWeightKg)?.cost || 0;
-        
-        let total = baseFare + mealCost + baggageCost;
-        
-        // Update hidden fields for submission
-        $("#selectedSeatHidden").val(selectedSeat);
-        $("#totalPriceHidden").val(total); 
-
-        $("#summary").html(`
-          Base Fare: PHP ${baseFare}<br>
-          Meal Cost: PHP ${mealCost}<br>
-          Baggage: PHP ${baggageCost} (${selectedWeightKg} kg)<br>
-          Seat: ${selectedSeat || "Not selected"}<br>
-          <b>Total: PHP ${total}</b>
-        `);
+      function updateUI() {
+          $('#paxDisplay').text(paxCount);
+          updateSummary();
       }
 
-      // Initial summary update
-      updateSummary();
+      function updateSummary(){
+        let grandTotal = 0;
+        let summaryHtml = '';
+        $('#seatInputsContainer').empty();
+        $('#seatsSelectedCount').text(selectedSeats.length);
+
+        $('.passenger-card').each(function(index) {
+            let i = index; 
+            let mealCost = parseInt($(this).find('.meal-select').val());
+            let baggageWeight = parseInt($(this).find('.baggage-select').val());
+            let baggageCost = baggageTiers.find(tier => tier.weight === baggageWeight)?.cost || 0;
+            let seat = selectedSeats[i] || "None";
+            
+            let passengerTotal = baseFare + mealCost + baggageCost;
+            grandTotal += passengerTotal;
+
+            summaryHtml += `
+            <p><strong>Passenger ${i + 1}</strong>: 
+               Seat: ${seat}, Meal: ₱${mealCost}, Bag: ₱${baggageCost} (${baggageWeight}kg) 
+               <br>Subtotal: ₱${passengerTotal}
+            </p>`;
+
+            if (selectedSeats[i]) {
+                $('#seatInputsContainer').append(`<input type="hidden" name="selectedSeat" value="${selectedSeats[i]}">`);
+            }
+        });
+
+        $("#summaryContent").html(summaryHtml);
+        $("#grandTotal").text(`Total Amount: PHP ${grandTotal}`);
+        $("#totalPriceHidden").val(grandTotal); 
+      }
+
+      $(document).on("change keyup", "select, input", updateSummary);
       
-      $("#meal, #baggage").on("change keyup", updateSummary);
-      
+      initForms();
+      generateSeatMap();
+
       $("#reservationForm").submit(function(e){
-        if (!selectedSeat) {
+        if (selectedSeats.length !== paxCount) {
             e.preventDefault();
-            alert("Please select a seat before confirming your reservation.");
+            alert(`You have ${paxCount} passengers but selected ${selectedSeats.length} seats. Please select a seat for everyone.`);
             return false;
         }
-        
-        // Final update of hidden fields before submission
-        updateSummary();
-        
-        // The form now submits to the POST route for creation
         return true; 
       });
     });

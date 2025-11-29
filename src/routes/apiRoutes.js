@@ -49,10 +49,27 @@ router.post('/checkin', async (req, res) => {
                 boardingPass: bpNum
             }
         });
+        
 
     } catch (err) {
         console.error("API Error:", err);
         return res.status(500).json({ success: false, message: "Server error processing check-in." });
+    }
+});
+
+router.get('/seats/:flightId', async (req, res) => {
+    try {
+        const flightId = req.params.flightId;
+        // Find all active reservations for this flight
+        const reservations = await Reservation.find({ 
+            flight: flightId, 
+            status: { $ne: 'Cancelled' } 
+        }).select('selectedSeat');
+
+        const occupiedSeats = reservations.map(r => r.selectedSeat);
+        res.json({ success: true, occupiedSeats });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 
